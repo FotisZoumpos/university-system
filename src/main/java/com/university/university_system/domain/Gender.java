@@ -1,4 +1,4 @@
-package domain;
+package com.university.university_system.domain;
 
 public enum Gender {
   MALE,
