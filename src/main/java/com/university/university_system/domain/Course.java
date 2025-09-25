@@ -2,6 +2,7 @@ package com.university.university_system.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -11,11 +12,15 @@ import jakarta.persistence.ManyToOne;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
-@Data
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -36,6 +41,6 @@ public class Course {
   @JoinColumn(name = "professor_id")
   private Professor professor;
 
-  @ManyToMany(mappedBy = "courses")
+  @ManyToMany(mappedBy = "courses" ,fetch = FetchType.EAGER)
   private List<Student> students;
 }

@@ -1,22 +1,29 @@
 package com.university.university_system.domain;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
-@Data
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -34,10 +41,10 @@ public class Professor {
   @Column(name = "last_name")
   private String lastName;
 
-  @Column(name = "email")
+  @Column(name = "email",unique = true)
   private String email;
 
-  @Column(name = "phone")
+  @Column(name = "phone",unique = true)
   private String phone;
 
   @Column(name = "birthday")
@@ -47,6 +54,13 @@ public class Professor {
   @Column(name = "gender")
   private Gender gender;
 
-  @OneToMany(mappedBy = "professor")
+  @OneToMany(mappedBy = "professor",cascade = CascadeType.ALL,orphanRemoval = true ,fetch = FetchType.EAGER)
   private List<Course> courses;
+
+  public void addCourse(Course course){
+    if(courses == null)
+      courses = new ArrayList<>();
+    courses.add(course);
+    course.setProfessor(this);
+  }
 }
