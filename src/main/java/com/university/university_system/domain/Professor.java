@@ -5,7 +5,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -54,12 +53,14 @@ public class Professor {
   @Column(name = "gender")
   private Gender gender;
 
-  @OneToMany(mappedBy = "professor",cascade = CascadeType.ALL,orphanRemoval = true ,fetch = FetchType.EAGER)
+  @ToString.Exclude
+  @OneToMany(mappedBy = "professor",cascade = CascadeType.PERSIST)
   private List<Course> courses;
 
   public void addCourse(Course course){
-    if(courses == null)
+    if(courses == null) {
       courses = new ArrayList<>();
+    }
     courses.add(course);
     course.setProfessor(this);
   }
