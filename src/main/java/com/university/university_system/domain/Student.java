@@ -11,6 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,7 +27,6 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
 public class Student {
 
   @Id
@@ -56,7 +56,18 @@ public class Student {
   @ManyToMany
   @JoinTable(name = "student_course",
       joinColumns = @JoinColumn(name = "student_id"),
-      inverseJoinColumns = @JoinColumn(name = "course_id")
-  )
+      inverseJoinColumns = @JoinColumn(name = "course_id"))
   private List<Course> courses;
+
+  public void addCourse(Course course){
+    if (course.getProfessor() == null) {
+      throw new IllegalStateException();
+    }
+    if (courses == null){
+      courses = new ArrayList<>();
+    }
+    courses.add(course);
+  }
 }
+
+
