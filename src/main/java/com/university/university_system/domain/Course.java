@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,10 +38,19 @@ public class Course {
   @Column(name = "year")
   private int year;
 
+  @ToString.Exclude
   @ManyToOne
   @JoinColumn(name = "professor_id")
   private Professor professor;
 
-  @ManyToMany(mappedBy = "courses" ,fetch = FetchType.EAGER)
+  @ManyToMany(mappedBy = "courses" )
   private List<Student> students;
+
+  public void addStudent(Student student){
+    if (students == null){
+      students = new ArrayList<>();
+    }
+    students.add(student);
+  }
+
 }
