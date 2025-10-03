@@ -31,11 +31,11 @@ public class Course {
   @Column(name = "id")
   private long id;
 
+  @Column(name = "name")
+  private String name;
+
   @Column(name = "description")
   private String description;
-
-  @Column(name = "year")
-  private int year;
 
   @ManyToOne
   @JoinColumn(name = "professor_id")

@@ -1,11 +1,9 @@
 package com.university.university_system.domain;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -54,7 +52,7 @@ public class Professor {
   @Column(name = "gender")
   private Gender gender;
 
-  @OneToMany(mappedBy = "professor",cascade = CascadeType.ALL,orphanRemoval = true ,fetch = FetchType.EAGER)
+  @OneToMany(mappedBy = "professor")
   private List<Course> courses;
 
   public void addCourse(Course course){
