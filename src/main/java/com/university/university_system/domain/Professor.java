@@ -1,6 +1,5 @@
 package com.university.university_system.domain;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -54,7 +53,7 @@ public class Professor {
   private Gender gender;
 
   @ToString.Exclude
-  @OneToMany(mappedBy = "professor",cascade = CascadeType.PERSIST)
+  @OneToMany(mappedBy = "professor")
   private List<Course> courses;
 
   public void addCourse(Course course){

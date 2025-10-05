@@ -20,6 +20,10 @@ public class CourseService {
     return courseRepo.save(course);
   }
 
+  public List<Course> findAllCourses(){
+    return courseRepo.findAll();
+  }
+
   public Optional<Course> findById(Long id){
     return courseRepo.findById(id);
   }
@@ -47,6 +51,14 @@ public class CourseService {
       return courseRepo.save(existingCourse);
     }
     return course;
+  }
+
+  public void deleteAllCourses(){
+    List<Course> courses = courseRepo.findAll();
+    for(Course course : courses){
+      clearCourseRelations(course);
+    }
+    courseRepo.deleteAll();
   }
   public void deleteById(Long id) {
     Optional<Course> courseOpt = courseRepo.findById(id);

@@ -78,6 +78,14 @@ public class ProfessorService {
 
   }
 
+  public void deleteAllProfessors(){
+    List<Professor> professors = professorRepo.findAll();
+    for(Professor professor : professors){
+      deleteProfessorRelations(professor);
+    }
+    professorRepo.deleteAll();
+  }
+
   public void deleteById(Long id) {
     Professor foundProfessor = professorRepo.findById(id).orElseThrow();
     deleteProfessorRelations(foundProfessor);
