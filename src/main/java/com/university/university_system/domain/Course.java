@@ -2,12 +2,14 @@ package com.university.university_system.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -18,37 +20,33 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
+@Table(name = "course")
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class Course {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id")
+  @Column(name = "id", nullable = false, updatable = false)
   private long id;
 
-  @Column(name = "name")
+  @Column(name = "name", nullable = false , unique = true)
   private String name;
 
-  @Column(name = "description")
+  @Column(name = "description", nullable = false)
   private String description;
 
   @ManyToOne
   @JoinColumn(name = "professor_id")
   private Professor professor;
 
-  @ManyToMany(mappedBy = "courses" )
-  private List<Student> students;
-
-  public void addStudent(Student student){
-    if (students == null){
-      students = new ArrayList<>();
-    }
-    students.add(student);
-  }
+  @ToString.Exclude
+  @Builder.Default
+  @ManyToMany(mappedBy = "courses", fetch = FetchType.EAGER)
+  private List<Student> students = new ArrayList<>();
 
 }
