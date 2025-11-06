@@ -16,57 +16,51 @@ public class CourseService {
 
   private final CourseRepository courseRepo;
 
-  public Course create(Course course){
+  public Course create(Course course) {
     return courseRepo.save(course);
   }
 
-  public List<Course> findAllCourses(){
-    return courseRepo.findAll();
-  }
-
-  public Optional<Course> findById(Long id){
+  public Optional<Course> findById(Long id) {
     return courseRepo.findById(id);
   }
 
+  @Transactional
   public Course update(Course course) {
-    courseRepo.findById(course.getId()).ifPresent(
-        existingCourse -> {
-
-          if(course.getName()!= null){
-            existingCourse.setName(course.getName());
-          }
-          if(course.getDescription() != null){
-            existingCourse.setDescription(course.getDescription());
-          }
-          if(course.getProfessor() != null){
-            existingCourse.setProfessor(course.getProfessor());
-          }
-          courseRepo.save(existingCourse);
-        }
-    );
+    courseRepo.findById(course.getId()).ifPresent(existingCourse -> {
+      if (course.getName() != null) {
+        existingCourse.setName(course.getName());
+      }
+      if (course.getDescription() != null) {
+        existingCourse.setDescription(course.getDescription());
+      }
+      courseRepo.save(existingCourse);
+    });
     return course;
   }
 
-  public void deleteAllCourses() {
-    List<Course> courses = courseRepo.findAll();
-
-    for (Course course : courses) {
-      deleteById(course.getId());
-    }
+  @Transactional
+  public Course updateCourseProfessor(Course course) {
+    courseRepo.findById(course.getId()).ifPresent(existingCourse -> {
+      if (course.getProfessor() != null) {
+        existingCourse.setProfessor(course.getProfessor());
+      }
+      courseRepo.save(existingCourse);
+    });
+    return course;
   }
 
-@Transactional
+  @Transactional
   public void deleteById(Long id) {
     Optional<Course> courseOpt = courseRepo.findById(id);
     if (courseOpt.isPresent()) {
       Course course = courseOpt.get();
       Professor professor = course.getProfessor();
-      if(professor != null){
+      if (professor != null) {
         professor.getCourses().remove(course);
         course.setProfessor(null);
       }
-      if(course.getStudents() != null){
-        for(Student student : course.getStudents()){
+      if (course.getStudents() != null) {
+        for (Student student : course.getStudents()) {
           student.getCourses().remove(course);
         }
         course.getStudents().clear();
@@ -74,4 +68,13 @@ public class CourseService {
       courseRepo.delete(course);
     }
   }
+
+  @Transactional
+  public void deleteAllById(List<Long> ids) {
+    List<Course> courses = courseRepo.findAllById(ids);
+    for (Course course : courses) {
+      deleteById(course.getId());
+    }
+  }
+
 }

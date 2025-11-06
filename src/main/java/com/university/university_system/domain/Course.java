@@ -34,7 +34,7 @@ public class Course {
   @Column(name = "id", nullable = false, updatable = false)
   private long id;
 
-  @Column(name = "name", nullable = false , unique = true)
+  @Column(name = "name", nullable = false, unique = true)
   private String name;
 
   @Column(name = "description", nullable = false)
