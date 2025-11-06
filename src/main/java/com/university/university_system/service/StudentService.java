@@ -10,10 +10,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 
 public class StudentService {
-  
+
   private final StudentRepository studentRepo;
 
   public Student create(Student student) {
@@ -24,48 +23,59 @@ public class StudentService {
     return studentRepo.findById(id);
   }
 
-  public List<Student> findAllStudents() {
-    return studentRepo.findAll();
-  }
-
+  @Transactional
   public Student updateStudent(Student student) {
-   studentRepo.findById(student.getId()).ifPresent(
-       existingStudent -> {
+    studentRepo.findById(student.getId()).ifPresent(
+        existingStudent -> {
 
-           if (student.getFirstName() != null) {
-             existingStudent.setFirstName(student.getFirstName());
-           }
-           if (student.getLastName() != null){
-             existingStudent.setLastName(student.getLastName());
-           }
-           if(student.getEmail() != null){
-             existingStudent.setEmail(student.getEmail());
-           }
-           if(student.getBirthday() !=null){
-             existingStudent.setBirthday(student.getBirthday());
-           }
-           if(student.getGender() !=null){
-             existingStudent.setGender(student.getGender());
-           }
-           if(student.getPhone() !=null){
-             existingStudent.setPhone(student.getPhone());
-           }
-           if (student.getCourses() != null) {
-             existingStudent.setCourses(student.getCourses());
-           }
-           studentRepo.save(existingStudent);
-         }
-         );
-   return student;
+          if (student.getFirstName() != null) {
+            existingStudent.setFirstName(student.getFirstName());
+          }
+          if (student.getLastName() != null) {
+            existingStudent.setLastName(student.getLastName());
+          }
+          if (student.getEmail() != null) {
+            existingStudent.setEmail(student.getEmail());
+          }
+          if (student.getBirthday() != null) {
+            existingStudent.setBirthday(student.getBirthday());
+          }
+          if (student.getGender() != null) {
+            existingStudent.setGender(student.getGender());
+          }
+          if (student.getPhone() != null) {
+            existingStudent.setPhone(student.getPhone());
+          }
+          studentRepo.save(existingStudent);
+        }
+    );
+    return student;
   }
 
-  public void deleteById(Long id){
+  @Transactional
+  public Student updateStudentCourse(Student student) {
+    studentRepo.findById(student.getId()).ifPresent(
+        existingStudent -> {
+          if (student.getCourses() != null) {
+            existingStudent.setCourses(student.getCourses());
+          }
+          studentRepo.save(existingStudent);
+        }
+    );
+    return student;
+  }
+
+  public void deleteById(Long id) {
     Student foundStudent = studentRepo.findById(id).orElseThrow();
     studentRepo.delete(foundStudent);
   }
 
-  public void deleteAllStudents(){
-    List<Student> students = studentRepo.findAll();
-    studentRepo.deleteAll(students);
+  @Transactional
+  public void deleteAllByIds(List<Long> ids) {
+    List<Student> students = studentRepo.findAllById(ids);
+    for (Student student : students) {
+      deleteById(student.getId());
+    }
   }
+
 }
