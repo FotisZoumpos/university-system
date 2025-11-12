@@ -1,6 +1,9 @@
 package com.university.university_system.service;
 
 import com.university.university_system.domain.Student;
+import com.university.university_system.dto.StudentDto;
+import com.university.university_system.mapper.CourseMapper;
+import com.university.university_system.mapper.StudentMapper;
 import com.university.university_system.repository.StudentRepository;
 import jakarta.transaction.Transactional;
 import java.util.List;
@@ -14,55 +17,67 @@ import org.springframework.stereotype.Service;
 public class StudentService {
 
   private final StudentRepository studentRepo;
+  private final StudentMapper studentMapper;
+  private final CourseMapper courseMapper;
 
-  public Student create(Student student) {
-    return studentRepo.save(student);
+//  public Student create(Student student) {
+//    return studentRepo.save(student);
+//  }
+
+  public StudentDto create(StudentDto studentDto) {
+    Student student = studentMapper.toEntity(studentDto);
+    Student savedStudent = studentRepo.save(student);
+    return studentMapper.toDto(savedStudent);
   }
 
-  public Optional<Student> findById(Long id) {
-    return studentRepo.findById(id);
-  }
-
-  @Transactional
-  public Student updateStudent(Student student) {
-    studentRepo.findById(student.getId()).ifPresent(
-        existingStudent -> {
-
-          if (student.getFirstName() != null) {
-            existingStudent.setFirstName(student.getFirstName());
-          }
-          if (student.getLastName() != null) {
-            existingStudent.setLastName(student.getLastName());
-          }
-          if (student.getEmail() != null) {
-            existingStudent.setEmail(student.getEmail());
-          }
-          if (student.getBirthday() != null) {
-            existingStudent.setBirthday(student.getBirthday());
-          }
-          if (student.getGender() != null) {
-            existingStudent.setGender(student.getGender());
-          }
-          if (student.getPhone() != null) {
-            existingStudent.setPhone(student.getPhone());
-          }
-          studentRepo.save(existingStudent);
-        }
-    );
-    return student;
+  public Optional<StudentDto> findById(Long id) {
+    return studentRepo.findById(id).map(studentMapper::toDto);
   }
 
   @Transactional
-  public Student updateStudentCourse(Student student) {
-    studentRepo.findById(student.getId()).ifPresent(
-        existingStudent -> {
-          if (student.getCourses() != null) {
-            existingStudent.setCourses(student.getCourses());
-          }
-          studentRepo.save(existingStudent);
-        }
-    );
-    return student;
+  public StudentDto updateStudentFields(StudentDto studentDto) {
+    Student updatedStudent = studentRepo.findById(studentDto.getId())
+        .map(
+            existingStudent -> {
+
+              if (studentDto.getFirstName() != null) {
+                existingStudent.setFirstName(studentDto.getFirstName());
+              }
+              if (studentDto.getLastName() != null) {
+                existingStudent.setLastName(studentDto.getLastName());
+              }
+              if (studentDto.getEmail() != null) {
+                existingStudent.setEmail(studentDto.getEmail());
+              }
+              if (studentDto.getBirthday() != null) {
+                existingStudent.setBirthday(studentDto.getBirthday());
+              }
+              if (studentDto.getGender() != null) {
+                existingStudent.setGender(studentDto.getGender());
+              }
+              if (studentDto.getPhone() != null) {
+                existingStudent.setPhone(studentDto.getPhone());
+              }
+              return studentRepo.save(existingStudent);
+            })
+        .orElseThrow();
+    return studentMapper.toDto(updatedStudent);
+  }
+
+  @Transactional
+  public StudentDto updateStudentCourse(StudentDto studentDto) {
+    Student updatedStudent = studentRepo.findById(studentDto.getId())
+        .map(
+            existingStudent -> {
+              if (studentDto.getCourses() != null) {
+                existingStudent.setCourses(studentDto.getCourses().stream()
+                    .map(courseMapper::toEntity)
+                    .toList());
+              }
+              return studentRepo.save(existingStudent);
+            })
+        .orElseThrow();
+    return studentMapper.toDto(updatedStudent);
   }
 
   public void deleteById(Long id) {

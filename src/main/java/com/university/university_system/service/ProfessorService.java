@@ -3,6 +3,9 @@ package com.university.university_system.service;
 import com.university.university_system.domain.Course;
 import com.university.university_system.domain.Professor;
 import com.university.university_system.domain.Student;
+import com.university.university_system.dto.ProfessorDto;
+import com.university.university_system.mapper.CourseMapper;
+import com.university.university_system.mapper.ProfessorMapper;
 import com.university.university_system.repository.ProfessorRepository;
 import jakarta.transaction.Transactional;
 import java.util.List;
@@ -15,51 +18,66 @@ import org.springframework.stereotype.Service;
 public class ProfessorService {
 
   private final ProfessorRepository professorRepo;
+  private final ProfessorMapper professorMapper;
+  private final CourseMapper courseMapper;
 
-  public Professor create(Professor professor) {
-    return professorRepo.save(professor);
+//  public Professor create(Professor professor) {
+//    return professorRepo.save(professor);
+//  }
+
+  public ProfessorDto create(ProfessorDto professorDto) {
+    Professor professor = professorMapper.toEntity(professorDto);
+    Professor savedProfessor = professorRepo.save(professor);
+    return professorMapper.toDto(savedProfessor);
   }
 
-  public Optional<Professor> findById(Long id) {
-    return professorRepo.findById(id);
-  }
-
-  @Transactional
-  public Professor updateProfessorFields(Professor professor) {
-    professorRepo.findById(professor.getId()).ifPresent(existingProfessor -> {
-
-      if (professor.getFirstName() != null) {
-        existingProfessor.setFirstName(professor.getFirstName());
-      }
-      if (professor.getLastName() != null) {
-        existingProfessor.setLastName(professor.getLastName());
-      }
-      if (professor.getEmail() != null) {
-        existingProfessor.setEmail(professor.getEmail());
-      }
-      if (professor.getBirthday() != null) {
-        existingProfessor.setBirthday(professor.getBirthday());
-      }
-      if (professor.getGender() != null) {
-        existingProfessor.setGender(professor.getGender());
-      }
-      if (professor.getPhone() != null) {
-        existingProfessor.setPhone(professor.getPhone());
-      }
-      professorRepo.save(existingProfessor);
-    });
-    return professor;
+  public Optional<ProfessorDto> findById(Long id) {
+    return professorRepo.findById(id).map(professorMapper::toDto);
   }
 
   @Transactional
-  public Professor updateProfessorCourses(Professor professor) {
-    professorRepo.findById(professor.getId()).ifPresent(existingProfessor -> {
-      if (professor.getCourses() != null) {
-        existingProfessor.setCourses(professor.getCourses());
-      }
-      professorRepo.save(existingProfessor);
-    });
-    return professor;
+  public ProfessorDto updateProfessorFields(ProfessorDto professorDto) {
+    Professor updatedProfessor = professorRepo.findById(professorDto.getId())
+        .map(existingProfessor -> {
+
+          if (professorDto.getFirstName() != null) {
+            existingProfessor.setFirstName(professorDto.getFirstName());
+          }
+          if (professorDto.getLastName() != null) {
+            existingProfessor.setLastName(professorDto.getLastName());
+          }
+          if (professorDto.getEmail() != null) {
+            existingProfessor.setEmail(professorDto.getEmail());
+          }
+          if (professorDto.getBirthday() != null) {
+            existingProfessor.setBirthday(professorDto.getBirthday());
+          }
+          if (professorDto.getGender() != null) {
+            existingProfessor.setGender(professorDto.getGender());
+          }
+          if (professorDto.getPhone() != null) {
+            existingProfessor.setPhone(professorDto.getPhone());
+          }
+          return professorRepo.save(existingProfessor);
+        })
+        .orElseThrow();
+    return professorMapper.toDto(updatedProfessor);
+  }
+
+  @Transactional
+  public ProfessorDto updateProfessorCourses(ProfessorDto professorDto) {
+    Professor updatedProfessor = professorRepo.findById(professorDto.getId())
+        .map(existingProfessor -> {
+          if (professorDto.getCourses() != null) {
+            existingProfessor.setCourses(
+                professorDto.getCourses().stream()
+                    .map(courseMapper::toEntity)
+                    .toList());
+          }
+          return professorRepo.save(existingProfessor);
+        })
+        .orElseThrow();
+    return professorMapper.toDto(updatedProfessor);
   }
 
   @Transactional

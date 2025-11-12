@@ -3,6 +3,9 @@ package com.university.university_system.service;
 import com.university.university_system.domain.Course;
 import com.university.university_system.domain.Professor;
 import com.university.university_system.domain.Student;
+import com.university.university_system.dto.CourseDto;
+import com.university.university_system.mapper.CourseMapper;
+import com.university.university_system.mapper.ProfessorMapper;
 import com.university.university_system.repository.CourseRepository;
 import jakarta.transaction.Transactional;
 import java.util.List;
@@ -15,38 +18,50 @@ import org.springframework.stereotype.Service;
 public class CourseService {
 
   private final CourseRepository courseRepo;
+  private final CourseMapper courseMapper;
+  private final ProfessorMapper professorMapper;
 
-  public Course create(Course course) {
-    return courseRepo.save(course);
+//  public Course create(Course course) {
+//    return courseRepo.save(course);
+//  }
+
+  public CourseDto create(CourseDto courseDto) {
+    Course course = courseMapper.toEntity(courseDto);
+    Course savedCourse = courseRepo.save(course);
+    return courseMapper.toDto(savedCourse);
   }
 
-  public Optional<Course> findById(Long id) {
-    return courseRepo.findById(id);
-  }
-
-  @Transactional
-  public Course update(Course course) {
-    courseRepo.findById(course.getId()).ifPresent(existingCourse -> {
-      if (course.getName() != null) {
-        existingCourse.setName(course.getName());
-      }
-      if (course.getDescription() != null) {
-        existingCourse.setDescription(course.getDescription());
-      }
-      courseRepo.save(existingCourse);
-    });
-    return course;
+  public Optional<CourseDto> findById(Long id) {
+    return courseRepo.findById(id).map(courseMapper::toDto);
   }
 
   @Transactional
-  public Course updateCourseProfessor(Course course) {
-    courseRepo.findById(course.getId()).ifPresent(existingCourse -> {
-      if (course.getProfessor() != null) {
-        existingCourse.setProfessor(course.getProfessor());
-      }
-      courseRepo.save(existingCourse);
-    });
-    return course;
+  public CourseDto updateCourseFields(CourseDto courseDto) {
+    Course updatedCourse = courseRepo.findById(courseDto.getId())
+        .map(existingCourse -> {
+          if (courseDto.getName() != null) {
+            existingCourse.setName(courseDto.getName());
+          }
+          if (courseDto.getDescription() != null) {
+            existingCourse.setDescription(courseDto.getDescription());
+          }
+          return courseRepo.save(existingCourse);
+        })
+        .orElseThrow();
+    return courseMapper.toDto(updatedCourse);
+  }
+
+  @Transactional
+  public CourseDto updateCourseProfessor(CourseDto courseDto) {
+    Course updatedCourse = courseRepo.findById(courseDto.getId())
+        .map(existingCourse -> {
+          if (courseDto.getProfessor() != null) {
+            existingCourse.setProfessor(professorMapper.toEntity(courseDto.getProfessor()));
+          }
+          return courseRepo.save(existingCourse);
+        })
+        .orElseThrow();
+    return courseMapper.toDto(updatedCourse);
   }
 
   @Transactional
