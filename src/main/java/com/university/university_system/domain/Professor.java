@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -56,6 +57,6 @@ public class Professor {
 
   @ToString.Exclude
   @OneToMany(mappedBy = "professor", fetch = FetchType.EAGER)
-  private List<Course> courses;
+  private List<Course> courses = new ArrayList<>();
 
 }

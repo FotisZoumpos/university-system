@@ -8,8 +8,10 @@ import com.university.university_system.mapper.CourseMapper;
 import com.university.university_system.mapper.ProfessorMapper;
 import com.university.university_system.repository.ProfessorRepository;
 import jakarta.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -72,7 +74,7 @@ public class ProfessorService {
             existingProfessor.setCourses(
                 professorDto.getCourses().stream()
                     .map(courseMapper::toEntity)
-                    .toList());
+                    .collect(Collectors.toCollection(ArrayList::new)));
           }
           return professorRepo.save(existingProfessor);
         })
@@ -81,7 +83,7 @@ public class ProfessorService {
   }
 
   @Transactional
-  public void deleteById(Long id) {
+  public ProfessorDto deleteById(Long id) {
     Professor foundProfessor = professorRepo.findById(id).orElseThrow();
     if (foundProfessor.getCourses() != null) {
       for (Course course : foundProfessor.getCourses()) {
@@ -94,6 +96,7 @@ public class ProfessorService {
       }
     }
     professorRepo.delete(foundProfessor);
+    return professorMapper.toDto(foundProfessor);
   }
 
   @Transactional
