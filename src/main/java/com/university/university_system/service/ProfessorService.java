@@ -6,6 +6,7 @@ import com.university.university_system.domain.Student;
 import com.university.university_system.dto.ProfessorDto;
 import com.university.university_system.mapper.CourseMapper;
 import com.university.university_system.mapper.ProfessorMapper;
+import com.university.university_system.repository.CourseRepository;
 import com.university.university_system.repository.ProfessorRepository;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
@@ -22,10 +23,7 @@ public class ProfessorService {
   private final ProfessorRepository professorRepo;
   private final ProfessorMapper professorMapper;
   private final CourseMapper courseMapper;
-
-//  public Professor create(Professor professor) {
-//    return professorRepo.save(professor);
-//  }
+  private final CourseRepository courseRepo;
 
   public ProfessorDto create(ProfessorDto professorDto) {
     Professor professor = professorMapper.toEntity(professorDto);
@@ -33,9 +31,21 @@ public class ProfessorService {
     return professorMapper.toDto(savedProfessor);
   }
 
+//  public Optional<ProfessorDto> findById(Long id) {
+//    return professorRepo.findById(id).map(professorMapper::toDto);
+//  }
+
   public Optional<ProfessorDto> findById(Long id) {
-    return professorRepo.findById(id).map(professorMapper::toDto);
+    return professorRepo.findById(id).map(professor -> {
+      ProfessorDto dto = professorMapper.toDto(professor);
+      // Μετατρέπουμε τα courses σε CourseDto
+      dto.setCourses(professor.getCourses().stream()
+          .map(courseMapper::toDto)
+          .collect(Collectors.toList()));
+      return dto;
+    });
   }
+
 
   @Transactional
   public ProfessorDto updateProfessorFields(ProfessorDto professorDto) {
@@ -71,14 +81,22 @@ public class ProfessorService {
     Professor updatedProfessor = professorRepo.findById(professorDto.getId())
         .map(existingProfessor -> {
           if (professorDto.getCourses() != null) {
-            existingProfessor.setCourses(
-                professorDto.getCourses().stream()
-                    .map(courseMapper::toEntity)
-                    .collect(Collectors.toCollection(ArrayList::new)));
+            List<Course> newCourses = professorDto.getCourses().stream()
+                .map(courseDto -> courseRepo.findById(courseDto.getId())
+                    .orElseThrow(() -> new RuntimeException("Course not found.")))
+                .collect(Collectors.toCollection(ArrayList::new));
+
+            for (Course course : newCourses) {
+              if (!existingProfessor.getCourses().contains(course)) {
+                existingProfessor.getCourses().add(course);
+                course.setProfessor(existingProfessor);
+              }
+            }
           }
           return professorRepo.save(existingProfessor);
         })
-        .orElseThrow();
+        .orElseThrow(() -> new RuntimeException("Professor not found."));
+
     return professorMapper.toDto(updatedProfessor);
   }
 

@@ -37,11 +37,10 @@ public class ProfessorController {
     return professorService.updateProfessorFields(professorDto);
   }
 
-//  //problem
-//  @PutMapping("/update-courses")
-//  public ProfessorDto updateProfessorCourses(@RequestBody ProfessorDto professorDto) {
-//    return professorService.updateProfessorCourses(professorDto);
-//  }
+  @PutMapping("/update-courses")
+  public ProfessorDto updateProfessorCourses(@RequestBody ProfessorDto professorDto) {
+    return professorService.updateProfessorCourses(professorDto);
+  }
 
   @DeleteMapping("/{id}")
   public ProfessorDto deleteProfessorById(@PathVariable Long id) {
