@@ -45,7 +45,22 @@ public class ProfessorService {
       return dto;
     });
   }
-
+//
+//  public List<ProfessorDto> findAll() {
+//    return professorRepo.findAll()
+//        .stream()
+//        .map(professor -> {
+//          ProfessorDto dto = professorMapper.toDto(professor);
+//          dto.setCourses(
+//              professor.getCourses()
+//                  .stream()
+//                  .map(courseMapper::toDto)
+//                  .collect(Collectors.toList())
+//          );
+//          return dto;
+//        })
+//        .collect(Collectors.toList());
+//  }
 
   @Transactional
   public ProfessorDto updateProfessorFields(ProfessorDto professorDto) {
@@ -81,7 +96,8 @@ public class ProfessorService {
     Professor updatedProfessor = professorRepo.findById(professorDto.getId())
         .map(existingProfessor -> {
           if (professorDto.getCourses() != null) {
-            List<Course> newCourses = professorDto.getCourses().stream()
+            List<Course> newCourses = professorDto.getCourses()
+                .stream()
                 .map(courseDto -> courseRepo.findById(courseDto.getId())
                     .orElseThrow(() -> new RuntimeException("Course not found.")))
                 .collect(Collectors.toCollection(ArrayList::new));

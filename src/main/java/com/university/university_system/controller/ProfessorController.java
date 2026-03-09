@@ -32,6 +32,11 @@ public class ProfessorController {
         .orElseThrow(() -> new RuntimeException("Professor not found"));
   }
 
+//  @GetMapping
+//  public List<ProfessorDto> getAllProfessors() {
+//    return professorService.findAll();
+//  }
+
   @PutMapping("/update")
   public ProfessorDto updateProfessor(@RequestBody ProfessorDto professorDto) {
     return professorService.updateProfessorFields(professorDto);
@@ -44,6 +49,7 @@ public class ProfessorController {
 
   @DeleteMapping("/{id}")
   public ProfessorDto deleteProfessorById(@PathVariable Long id) {
+
     return professorService.deleteById(id);
   }
 
