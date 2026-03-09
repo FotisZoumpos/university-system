@@ -1,9 +1,12 @@
 package com.university.university_system.service;
 
+import com.university.university_system.domain.Course;
 import com.university.university_system.domain.Student;
+import com.university.university_system.dto.CourseDto;
 import com.university.university_system.dto.StudentDto;
 import com.university.university_system.mapper.CourseMapper;
 import com.university.university_system.mapper.StudentMapper;
+import com.university.university_system.repository.CourseRepository;
 import com.university.university_system.repository.StudentRepository;
 import jakarta.transaction.Transactional;
 import java.util.List;
@@ -19,6 +22,7 @@ public class StudentService {
   private final StudentRepository studentRepo;
   private final StudentMapper studentMapper;
   private final CourseMapper courseMapper;
+  private final CourseRepository courseRepo;
 
 //  public Student create(Student student) {
 //    return studentRepo.save(student);
@@ -64,25 +68,65 @@ public class StudentService {
     return studentMapper.toDto(updatedStudent);
   }
 
+//  @Transactional
+//  public StudentDto updateStudentCourse(StudentDto studentDto) {
+//    Student updatedStudent = studentRepo.findById(studentDto.getId())
+//        .map(
+//            existingStudent -> {
+//              if (studentDto.getCourses() != null) {
+//                existingStudent.setCourses(studentDto.getCourses()
+//                    .stream()
+//                    .map(courseMapper::toEntity)
+//                    .toList());
+//              }
+//              return studentRepo.save(existingStudent);
+//            })
+//        .orElseThrow();
+//    return studentMapper.toDto(updatedStudent);
+//  }
+
   @Transactional
   public StudentDto updateStudentCourse(StudentDto studentDto) {
-    Student updatedStudent = studentRepo.findById(studentDto.getId())
-        .map(
-            existingStudent -> {
-              if (studentDto.getCourses() != null) {
-                existingStudent.setCourses(studentDto.getCourses().stream()
-                    .map(courseMapper::toEntity)
-                    .toList());
-              }
-              return studentRepo.save(existingStudent);
-            })
+
+    Student student = studentRepo.findById(studentDto.getId())
         .orElseThrow();
-    return studentMapper.toDto(updatedStudent);
+
+    if (studentDto.getCourses() != null) {
+
+      List<Long> courseIds = studentDto.getCourses()
+          .stream()
+          .map(c -> c.getId())
+          .toList();
+
+      List<Course> courses = courseRepo.findAllById(courseIds);
+
+      student.setCourses(courses);
+    }
+    // Χειροκίνητο mapping χωρίς recursion
+    StudentDto result = new StudentDto();
+    result.setId(student.getId());
+    result.setFirstName(student.getFirstName());
+    result.setLastName(student.getLastName());
+    result.setEmail(student.getEmail());
+    result.setPhone(student.getPhone());
+    result.setBirthday(student.getBirthday());
+    result.setGender(student.getGender());
+    // Μόνο τα courses χωρίς τον professor
+    result.setCourses(student.getCourses().stream()
+        .map(c -> CourseDto.builder()
+            .id(c.getId())
+            .name(c.getName())
+            .description(c.getDescription())
+            .build())
+        .toList());
+
+    return result;
   }
 
-  public void deleteById(Long id) {
+  public StudentDto deleteById(Long id) {
     Student foundStudent = studentRepo.findById(id).orElseThrow();
     studentRepo.delete(foundStudent);
+    return studentMapper.toDto(foundStudent);
   }
 
   @Transactional
