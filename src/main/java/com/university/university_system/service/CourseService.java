@@ -65,7 +65,7 @@ public class CourseService {
   }
 
   @Transactional
-  public void deleteById(Long id) {
+  public CourseDto deleteById(Long id) {
     Optional<Course> courseOpt = courseRepo.findById(id);
     if (courseOpt.isPresent()) {
       Course course = courseOpt.get();
@@ -81,7 +81,9 @@ public class CourseService {
         course.getStudents().clear();
       }
       courseRepo.delete(course);
+      return courseMapper.toDto(course);
     }
+    throw new RuntimeException("Course not found");
   }
 
   @Transactional
