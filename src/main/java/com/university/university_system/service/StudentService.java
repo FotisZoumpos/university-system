@@ -68,60 +68,7 @@ public class StudentService {
     return studentMapper.toDto(updatedStudent);
   }
 
-//  @Transactional
-//  public StudentDto updateStudentCourse(StudentDto studentDto) {
-//    Student updatedStudent = studentRepo.findById(studentDto.getId())
-//        .map(
-//            existingStudent -> {
-//              if (studentDto.getCourses() != null) {
-//                existingStudent.setCourses(studentDto.getCourses()
-//                    .stream()
-//                    .map(courseMapper::toEntity)
-//                    .toList());
-//              }
-//              return studentRepo.save(existingStudent);
-//            })
-//        .orElseThrow();
-//    return studentMapper.toDto(updatedStudent);
-//  }
 
-//  @Transactional
-//  public StudentDto updateStudentCourse(StudentDto studentDto) {
-//
-//    Student student = studentRepo.findById(studentDto.getId())
-//        .orElseThrow();
-//
-//    if (studentDto.getCourses() != null) {
-//
-//      List<Long> courseIds = studentDto.getCourses()
-//          .stream()
-//          .map(c -> c.getId())
-//          .toList();
-//
-//      List<Course> courses = courseRepo.findAllById(courseIds);
-//
-//      student.setCourses(courses);
-//    }
-//    // Χειροκίνητο mapping χωρίς recursion
-//    StudentDto result = new StudentDto();
-//    result.setId(student.getId());
-//    result.setFirstName(student.getFirstName());
-//    result.setLastName(student.getLastName());
-//    result.setEmail(student.getEmail());
-//    result.setPhone(student.getPhone());
-//    result.setBirthday(student.getBirthday());
-//    result.setGender(student.getGender());
-//    // Μόνο τα courses χωρίς τον professor
-//    result.setCourses(student.getCourses().stream()
-//        .map(c -> CourseDto.builder()
-//            .id(c.getId())
-//            .name(c.getName())
-//            .description(c.getDescription())
-//            .build())
-//        .toList());
-//
-//    return result;
-//  }
 
   @Transactional
   public StudentDto updateStudentCourse(StudentDto studentDto) {
@@ -136,6 +83,13 @@ public class StudentService {
           .toList();
 
       List<Course> courses = courseRepo.findAllById(courseIds);
+      for (Course course : courses) {
+        if (course.getProfessor() == null) {
+          throw new IllegalStateException(
+              "Course '" + course.getName() + "' does not have a professor assigned."
+          );
+        }
+      }
       student.setCourses(courses);
     }
 
@@ -147,6 +101,7 @@ public class StudentService {
     return result;
   }
 
+  @Transactional
   public StudentDto deleteById(Long id) {
     Student foundStudent = studentRepo.findById(id).orElseThrow();
     studentRepo.delete(foundStudent);
