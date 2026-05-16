@@ -7,6 +7,7 @@ import com.university.university_system.dto.CourseDto;
 import com.university.university_system.mapper.CourseMapper;
 import com.university.university_system.mapper.ProfessorMapper;
 import com.university.university_system.repository.CourseRepository;
+import com.university.university_system.repository.ProfessorRepository;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,7 @@ public class CourseService {
 
   private final CourseRepository courseRepo;
   private final CourseMapper courseMapper;
+  private final ProfessorRepository professorRepo;
   private final ProfessorMapper professorMapper;
 
 //  public Course create(Course course) {
@@ -56,7 +58,9 @@ public class CourseService {
     Course updatedCourse = courseRepo.findById(courseDto.getId())
         .map(existingCourse -> {
           if (courseDto.getProfessor() != null) {
-            existingCourse.setProfessor(professorMapper.toEntity(courseDto.getProfessor()));
+            Professor professor = professorRepo.findById(courseDto.getProfessor().getId())
+                .orElseThrow(() -> new RuntimeException("Professor not found"));
+            existingCourse.setProfessor(professor);
           }
           return courseRepo.save(existingCourse);
         })
