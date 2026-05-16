@@ -85,6 +85,44 @@ public class StudentService {
 //    return studentMapper.toDto(updatedStudent);
 //  }
 
+//  @Transactional
+//  public StudentDto updateStudentCourse(StudentDto studentDto) {
+//
+//    Student student = studentRepo.findById(studentDto.getId())
+//        .orElseThrow();
+//
+//    if (studentDto.getCourses() != null) {
+//
+//      List<Long> courseIds = studentDto.getCourses()
+//          .stream()
+//          .map(c -> c.getId())
+//          .toList();
+//
+//      List<Course> courses = courseRepo.findAllById(courseIds);
+//
+//      student.setCourses(courses);
+//    }
+//    // Χειροκίνητο mapping χωρίς recursion
+//    StudentDto result = new StudentDto();
+//    result.setId(student.getId());
+//    result.setFirstName(student.getFirstName());
+//    result.setLastName(student.getLastName());
+//    result.setEmail(student.getEmail());
+//    result.setPhone(student.getPhone());
+//    result.setBirthday(student.getBirthday());
+//    result.setGender(student.getGender());
+//    // Μόνο τα courses χωρίς τον professor
+//    result.setCourses(student.getCourses().stream()
+//        .map(c -> CourseDto.builder()
+//            .id(c.getId())
+//            .name(c.getName())
+//            .description(c.getDescription())
+//            .build())
+//        .toList());
+//
+//    return result;
+//  }
+
   @Transactional
   public StudentDto updateStudentCourse(StudentDto studentDto) {
 
@@ -92,32 +130,18 @@ public class StudentService {
         .orElseThrow();
 
     if (studentDto.getCourses() != null) {
-
       List<Long> courseIds = studentDto.getCourses()
           .stream()
           .map(c -> c.getId())
           .toList();
 
       List<Course> courses = courseRepo.findAllById(courseIds);
-
       student.setCourses(courses);
     }
-    // Χειροκίνητο mapping χωρίς recursion
-    StudentDto result = new StudentDto();
-    result.setId(student.getId());
-    result.setFirstName(student.getFirstName());
-    result.setLastName(student.getLastName());
-    result.setEmail(student.getEmail());
-    result.setPhone(student.getPhone());
-    result.setBirthday(student.getBirthday());
-    result.setGender(student.getGender());
-    // Μόνο τα courses χωρίς τον professor
+
+    StudentDto result = studentMapper.toDto(student);
     result.setCourses(student.getCourses().stream()
-        .map(c -> CourseDto.builder()
-            .id(c.getId())
-            .name(c.getName())
-            .description(c.getDescription())
-            .build())
+        .map(courseMapper::toDto)
         .toList());
 
     return result;
@@ -132,9 +156,10 @@ public class StudentService {
   @Transactional
   public void deleteAllByIds(List<Long> ids) {
     List<Student> students = studentRepo.findAllById(ids);
-    for (Student student : students) {
-      deleteById(student.getId());
-    }
+    studentRepo.deleteAll(students);
+//    for (Student student : students) {
+//      deleteById(student.getId());
+//    }
   }
 
 }

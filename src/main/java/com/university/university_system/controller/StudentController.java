@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -32,11 +33,12 @@ public class StudentController {
         .orElseThrow(() -> new RuntimeException("Student not found"));
   }
 
+  //@PatchMapping
   @PutMapping("/update")
   public StudentDto updateStudent(@RequestBody StudentDto studentDto) {
     return studentService.updateStudentFields(studentDto);
   }
-
+  //@PatchMapping
   @PutMapping("/update-courses")
   public StudentDto updateStudentCourses(@RequestBody StudentDto studentDto) {
     return studentService.updateStudentCourse(studentDto);
@@ -49,7 +51,7 @@ public class StudentController {
 
   @DeleteMapping("/list")
   public void deleteStudentsList(@RequestBody List<Long> ids) {
-    if (ids == null || ids.size() < 2) {
+    if (ids == null || ids.isEmpty()) {
       throw new IllegalArgumentException("At least 2 ids.");
     }
     studentService.deleteAllByIds(ids);

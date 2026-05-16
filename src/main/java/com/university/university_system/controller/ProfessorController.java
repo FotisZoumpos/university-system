@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -37,11 +38,13 @@ public class ProfessorController {
 //    return professorService.findAll();
 //  }
 
+  //@PatchMapping
   @PutMapping("/update")
   public ProfessorDto updateProfessor(@RequestBody ProfessorDto professorDto) {
     return professorService.updateProfessorFields(professorDto);
   }
 
+  //@PatchMapping
   @PutMapping("/update-courses")
   public ProfessorDto updateProfessorCourses(@RequestBody ProfessorDto professorDto) {
     return professorService.updateProfessorCourses(professorDto);
@@ -55,7 +58,7 @@ public class ProfessorController {
 
   @DeleteMapping("/list")
   public void deleteProfessorsList(@RequestBody List<Long> ids) {
-    if (ids == null || ids.size() < 2) {
+    if (ids == null || ids.isEmpty()) {
       throw new IllegalArgumentException("At least 2 ids.");
     }
     professorService.deleteAllById(ids);

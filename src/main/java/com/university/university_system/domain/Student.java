@@ -34,19 +34,19 @@ public class Student {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id" , nullable = false , updatable = false)
-  private long id;
+  @Column(name = "id", nullable = false, updatable = false)
+  private Long id;
 
-  @Column(name = "first_name" , nullable = false)
+  @Column(name = "first_name", nullable = false)
   private String firstName;
 
-  @Column(name = "last_name" , nullable = false)
+  @Column(name = "last_name", nullable = false)
   private String lastName;
 
-  @Column(name = "email" , unique = true)
+  @Column(name = "email", unique = true)
   private String email;
 
-  @Column(name = "phone" , unique = true)
+  @Column(name = "phone", unique = true)
   private String phone;
 
   @Column(name = "birthday")
@@ -57,21 +57,22 @@ public class Student {
   private Gender gender;
 
   @ToString.Exclude
-  @ManyToMany(fetch = FetchType.EAGER)
+  @Builder.Default
+  @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "student_course",
       joinColumns = @JoinColumn(name = "student_id"),
       inverseJoinColumns = @JoinColumn(name = "course_id"))
-  private List<Course> courses;
+  private List<Course> courses = new ArrayList<>();
 
-  public void addCourse(Course course){
-    if (course.getProfessor() == null) {
-      throw new IllegalStateException("No professor is teaching this course.");
-    }
-    if (courses == null){
-      courses = new ArrayList<>();
-    }
-    courses.add(course);
-  }
+//  public void addCourse(Course course) {
+//    if (course.getProfessor() == null) {
+//      throw new IllegalStateException("No professor is teaching this course.");
+//    }
+//    if (courses == null) {
+//      courses = new ArrayList<>();
+//    }
+//    courses.add(course);
+//  }
 }
 
 

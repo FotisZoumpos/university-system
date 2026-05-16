@@ -27,25 +27,25 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table (name = "professor")
+@Table(name = "professor")
 public class Professor {
 
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id", nullable = false , updatable = false)
-  private long id;
+  @Column(name = "id", nullable = false, updatable = false)
+  private Long id;
 
-  @Column(name = "first_name" , nullable = false)
+  @Column(name = "first_name", nullable = false)
   private String firstName;
 
-  @Column(name = "last_name" , nullable = false)
+  @Column(name = "last_name", nullable = false)
   private String lastName;
 
-  @Column(name = "email",unique = true)
+  @Column(name = "email", unique = true)
   private String email;
 
-  @Column(name = "phone",unique = true)
+  @Column(name = "phone", unique = true)
   private String phone;
 
   @Column(name = "birthday")
@@ -56,7 +56,8 @@ public class Professor {
   private Gender gender;
 
   @ToString.Exclude
-  @OneToMany(mappedBy = "professor", fetch = FetchType.EAGER)
+  @Builder.Default
+  @OneToMany(mappedBy = "professor", fetch = FetchType.LAZY)
   private List<Course> courses = new ArrayList<>();
 
 }

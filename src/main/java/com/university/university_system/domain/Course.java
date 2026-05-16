@@ -32,7 +32,7 @@ public class Course {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id", nullable = false, updatable = false)
-  private long id;
+  private Long id;
 
   @Column(name = "name", nullable = false, unique = true)
   private String name;
@@ -46,7 +46,7 @@ public class Course {
 
   @ToString.Exclude
   @Builder.Default
-  @ManyToMany(mappedBy = "courses", fetch = FetchType.EAGER)
+  @ManyToMany(mappedBy = "courses", fetch = FetchType.LAZY)
   private List<Student> students = new ArrayList<>();
 
 }

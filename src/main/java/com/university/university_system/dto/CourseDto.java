@@ -16,7 +16,7 @@ import lombok.ToString;
 @ToString
 
 public class CourseDto {
-  private long id;
+  private Long id;
   private String name;
   private String description;
   
