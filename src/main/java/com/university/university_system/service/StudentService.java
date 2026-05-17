@@ -2,7 +2,6 @@ package com.university.university_system.service;
 
 import com.university.university_system.domain.Course;
 import com.university.university_system.domain.Student;
-import com.university.university_system.dto.CourseDto;
 import com.university.university_system.dto.StudentDto;
 import com.university.university_system.mapper.CourseMapper;
 import com.university.university_system.mapper.StudentMapper;
@@ -23,10 +22,6 @@ public class StudentService {
   private final StudentMapper studentMapper;
   private final CourseMapper courseMapper;
   private final CourseRepository courseRepo;
-
-//  public Student create(Student student) {
-//    return studentRepo.save(student);
-//  }
 
   public StudentDto create(StudentDto studentDto) {
     Student student = studentMapper.toEntity(studentDto);

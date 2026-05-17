@@ -1,5 +1,6 @@
 package com.university.university_system.service;
 
+import static org.hamcrest.Matchers.any;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -13,6 +14,7 @@ import com.university.university_system.mapper.StudentMapper;
 import com.university.university_system.repository.CourseRepository;
 import com.university.university_system.repository.StudentRepository;
 import java.time.LocalDate;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -84,10 +86,8 @@ class StudentServiceTest {
       when(studentRepo.save(student)).thenReturn(savedStudent);
       when(studentMapper.toDto(savedStudent)).thenReturn(expectedDto);
 
-      // Act
       StudentDto result = studentService.create(inputDto);
 
-      // Assert
       assertEquals(1L, result.getId());
       assertEquals("Fotis", result.getFirstName());
       assertEquals("Zoumpos",result.getLastName());
@@ -98,4 +98,45 @@ class StudentServiceTest {
 
       verify(studentRepo, times(1)).save(student);
     }
+
+    @Test
+    void findById_shouldFindStudentDto(){
+
+      Student foundStudent = Student.builder()
+          .id(1L)
+          .firstName("fotis")
+          .lastName("zoumpos")
+          .birthday(LocalDate.of(1993,4,4))
+          .email("f@z")
+          .gender(Gender.MALE)
+          .phone("123")
+          .build();
+
+      StudentDto expectedDto = StudentDto.builder()
+          .id(1L)
+          .firstName("fotis")
+          .lastName("zoumpos")
+          .birthday(LocalDate.of(1993,4,4))
+          .email("f@z")
+          .gender(Gender.MALE)
+          .phone("123")
+          .build();
+
+      when(studentRepo.findById(1L)).thenReturn(Optional.of(foundStudent));
+      when(studentMapper.toDto(foundStudent)).thenReturn(expectedDto);
+
+      Optional<StudentDto> result = studentService.findById(1L);
+
+      assertEquals(1L, result.get().getId());
+      assertEquals("fotis", result.get().getFirstName());
+      assertEquals("zoumpos",result.get().getLastName());
+      assertEquals(LocalDate.of(1993,4,4),result.get().getBirthday());
+      assertEquals("123",result.get().getPhone());
+      assertEquals("f@z",result.get().getEmail());
+      assertEquals(Gender.MALE,result.get().getGender());
+
+      verify(studentRepo,times(1)).findById(1L);
+    }
+
+
   }
