@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -16,6 +17,7 @@ import com.university.university_system.mapper.StudentMapper;
 import com.university.university_system.repository.CourseRepository;
 import com.university.university_system.repository.StudentRepository;
 import java.time.LocalDate;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -168,4 +170,154 @@ class StudentServiceTest {
     verify(studentRepo,times(0)).findById(any());
 
   }
+
+  @Test
+  void updateStudentFields_shouldUpdateStudent() {
+
+    StudentDto inputDto = StudentDto.builder()
+        .id(1L)
+        .firstName("leo")
+        .lastName("c")
+        .birthday(LocalDate.of(2000, 4, 4))
+        .email("l@c")
+        .phone("321")
+        .gender(Gender.FEMALE)
+        .build();
+
+    Student foundStudent = Student.builder()
+        .id(1L)
+        .firstName("fotis")
+        .lastName("zou")
+        .birthday(LocalDate.of(1993, 4, 4))
+        .email("f@z")
+        .phone("123")
+        .gender(Gender.MALE)
+        .build();
+
+    Student updatedStudent = Student.builder()
+        .id(1L)
+        .firstName("leo")
+        .lastName("c")
+        .birthday(LocalDate.of(2000, 4, 4))
+        .email("l@c")
+        .phone("321")
+        .gender(Gender.FEMALE)
+        .build();
+
+    StudentDto expectedDto = StudentDto.builder()
+        .id(1L)
+        .firstName("leo")
+        .lastName("c")
+        .birthday(LocalDate.of(2000, 4, 4))
+        .email("l@c")
+        .phone("321")
+        .gender(Gender.FEMALE)
+        .build();
+
+    when(studentRepo.findById(1L)).thenReturn(Optional.of(foundStudent));
+    when(studentRepo.save(foundStudent)).thenReturn(updatedStudent);
+    when(studentMapper.toDto(updatedStudent)).thenReturn(expectedDto);
+
+    StudentDto result = studentService.updateStudentFields(inputDto);
+
+    assertEquals(expectedDto.getId(), result.getId());
+    assertEquals(expectedDto.getFirstName(), result.getFirstName());
+    assertEquals(expectedDto.getLastName(), result.getLastName());
+    assertEquals(expectedDto.getBirthday(), result.getBirthday());
+    assertEquals(expectedDto.getEmail(), result.getEmail());
+    assertEquals(expectedDto.getPhone(), result.getPhone());
+    assertEquals(expectedDto.getGender(), result.getGender());
+
+    verify(studentRepo,times(1)).findById(1L);
+    verify(studentRepo,times(1)).save(foundStudent);
+  }
+
+  @Test
+  void updateStudentFields_shouldThrowExceptionWhenStudentNotFound(){
+
+    when(studentRepo.findById(1L)).thenReturn(Optional.empty());
+
+    assertThrows(NoSuchElementException.class,()->studentService.updateStudentFields(
+            StudentDto.builder().id(1L).build()
+        )
+    );
+    verify(studentRepo,times(1)).findById(1L);
+    verify(studentRepo,never()).save(any());
+  }
+
+  @Test
+  void updateStudentFields_shouldUpdateOnlyProvidedFields() {
+
+    StudentDto inputDto = StudentDto.builder()
+        .id(1L)
+        .email("new@email.com")
+        .build();
+
+    Student foundStudent = Student.builder()
+        .id(1L)
+        .firstName("Fotis")
+        .lastName("Zoumpos")
+        .birthday(LocalDate.of(1993, 4, 4))
+        .email("old@email.com")
+        .phone("123")
+        .gender(Gender.MALE)
+        .build();
+
+    Student updatedStudent = Student.builder()
+        .id(1L)
+        .firstName("Fotis")
+        .lastName("Zoumpos")
+        .birthday(LocalDate.of(1993, 4, 4))
+        .email("new@email.com")
+        .phone("123")
+        .gender(Gender.MALE)
+        .build();
+
+    StudentDto expectedDto = StudentDto.builder()
+        .id(1L)
+        .firstName("Fotis")
+        .lastName("Zoumpos")
+        .birthday(LocalDate.of(1993, 4, 4))
+        .email("new@email.com")
+        .phone("123")
+        .gender(Gender.MALE)
+        .build();
+
+    when(studentRepo.findById(1L)).thenReturn(Optional.of(foundStudent));
+
+    when(studentRepo.save(foundStudent)).thenReturn(updatedStudent);
+
+    when(studentMapper.toDto(updatedStudent)).thenReturn(expectedDto);
+
+    StudentDto result = studentService.updateStudentFields(inputDto);
+
+    assertEquals("Fotis", result.getFirstName());
+    assertEquals("Zoumpos", result.getLastName());
+    assertEquals("new@email.com", result.getEmail());
+    assertEquals("123", result.getPhone());
+
+    verify(studentRepo).findById(1L);
+    verify(studentRepo).save(foundStudent);
+
+    assertEquals("Fotis", foundStudent.getFirstName());
+    assertEquals("new@email.com", foundStudent.getEmail());
+  }
+
+  @Test
+  void updateStudentFields_shouldThrowExceptionWhenStudentDtoIsNull(){
+
+    assertThrows(IllegalArgumentException.class,()->studentService.updateStudentFields(null));
+
+  }
+
+  @Test
+  void updateStudentFields_shouldThrowExceptionWhenIdIsNull(){
+
+    StudentDto inputDto = StudentDto.builder()
+        .id(null)
+        .build();
+
+    assertThrows(IllegalArgumentException.class,()->studentService.updateStudentFields(inputDto));
+  }
+
 }
