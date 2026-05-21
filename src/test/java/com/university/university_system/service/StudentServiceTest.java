@@ -479,4 +479,51 @@ class StudentServiceTest {
 
   }
 
+  @Test
+  void deleteById_shouldDeleteStudentById(){
+
+    Student foundStudent = Student.builder()
+        .id(1L)
+        .firstName("Fotis")
+        .lastName("Zoumpos")
+        .build();
+
+    StudentDto expectedDto = StudentDto.builder()
+        .id(1L)
+        .firstName("Fotis")
+        .lastName("Zoumpos")
+        .build();
+
+    when(studentRepo.findById(1L)).thenReturn(Optional.of(foundStudent));
+    when(studentMapper.toDto(foundStudent)).thenReturn(expectedDto);
+
+    StudentDto result = studentService.deleteById(1L);
+
+    assertEquals(1L,result.getId());
+    assertEquals("Fotis",result.getFirstName());
+    assertEquals("Zoumpos",result.getLastName());
+
+    verify(studentRepo).findById(1L);
+    verify(studentRepo).delete(foundStudent);
+  }
+
+  @Test
+  void deleteById_shouldThrowExceptionWhenIdIsNull(){
+
+    assertThrows(IllegalArgumentException.class,()->studentService.deleteById(null));
+
+  }
+
+  @Test
+  void deleteById_shouldThrowExceptionWhenStudentNotFound(){
+
+    when(studentRepo.findById(1L)).thenReturn(Optional.empty());
+
+    assertThrows(NoSuchElementException.class,()->studentService.deleteById(1L));
+
+    verify(studentRepo).findById(1L);
+    verify(studentRepo,never()).deleteById(any());
+  }
+
+
 }
