@@ -1,7 +1,9 @@
 package com.university.university_system.service;
 
-import static org.hamcrest.Matchers.any;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -99,7 +101,15 @@ class StudentServiceTest {
       verify(studentRepo, times(1)).save(student);
     }
 
-    @Test
+  @Test
+  void create_shouldThrowExceptionWhenStudentDtoIsNull(){
+
+    assertThrows(IllegalArgumentException.class,()->studentService.create(null));
+
+    verify(studentRepo,times(0)).save(any());
+  }
+
+  @Test
     void findById_shouldFindStudentDto(){
 
       Student foundStudent = Student.builder()
@@ -138,5 +148,24 @@ class StudentServiceTest {
       verify(studentRepo,times(1)).findById(1L);
     }
 
+  @Test
+  void findById_StudentDtoNotFound(){
+
+    when(studentRepo.findById(1L)).thenReturn(Optional.empty());
+
+    Optional<StudentDto> result = studentService.findById(1L);
+
+    assertTrue(result.isEmpty());
+    verify(studentRepo,times(1)).findById(1L);
 
   }
+
+  @Test
+  void findById_shouldThrowExceptionWhenIdIsNull(){
+
+    assertThrows(IllegalArgumentException.class,()->studentService.findById(null));
+
+    verify(studentRepo,times(0)).findById(any());
+
+  }
+}
