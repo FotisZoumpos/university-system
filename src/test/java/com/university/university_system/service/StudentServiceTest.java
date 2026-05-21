@@ -525,5 +525,23 @@ class StudentServiceTest {
     verify(studentRepo,never()).deleteById(any());
   }
 
+  @Test
+  void deleteAllByIds_shouldSuccessfullyDeleteAllIds(){
+
+    List<Long> ids = List.of(1L,2L);
+
+    List<Student> students = List.of(
+        Student.builder().id(1L).build(),
+        Student.builder().id(2L).build()
+    );
+
+    when(studentRepo.findAllById(ids)).thenReturn(students);
+
+    studentService.deleteAllByIds(ids);
+
+    verify(studentRepo).findAllById(ids);
+    verify(studentRepo).deleteAll(students);
+  }
+
 
 }
