@@ -24,17 +24,29 @@ public class StudentService {
   private final CourseRepository courseRepo;
 
   public StudentDto create(StudentDto studentDto) {
+    if (studentDto == null) {
+      throw new IllegalArgumentException("StudentDto can't be null");
+    }
     Student student = studentMapper.toEntity(studentDto);
     Student savedStudent = studentRepo.save(student);
     return studentMapper.toDto(savedStudent);
   }
 
   public Optional<StudentDto> findById(Long id) {
+    if (id == null) {
+      throw new IllegalArgumentException("Student id can't be null");
+    }
     return studentRepo.findById(id).map(studentMapper::toDto);
   }
 
   @Transactional
   public StudentDto updateStudentFields(StudentDto studentDto) {
+    if (studentDto == null) {
+      throw new IllegalArgumentException("StudentDto can't be null");
+    }
+    if (studentDto.getId() == null) {
+      throw new IllegalArgumentException("Student id cannot be null");
+    }
     Student updatedStudent = studentRepo.findById(studentDto.getId())
         .map(
             existingStudent -> {
@@ -64,10 +76,15 @@ public class StudentService {
   }
 
 
-
   @Transactional
   public StudentDto updateStudentCourse(StudentDto studentDto) {
 
+    if (studentDto == null) {
+      throw new IllegalArgumentException("StudedntDto can't be null");
+    }
+    if (studentDto.getId() == null) {
+      throw new IllegalArgumentException("Id can't be null");
+    }
     Student student = studentRepo.findById(studentDto.getId())
         .orElseThrow();
 
@@ -98,6 +115,9 @@ public class StudentService {
 
   @Transactional
   public StudentDto deleteById(Long id) {
+    if (id == null) {
+      throw new IllegalArgumentException("Student id cannot be null");
+    }
     Student foundStudent = studentRepo.findById(id).orElseThrow();
     studentRepo.delete(foundStudent);
     return studentMapper.toDto(foundStudent);
@@ -107,9 +127,7 @@ public class StudentService {
   public void deleteAllByIds(List<Long> ids) {
     List<Student> students = studentRepo.findAllById(ids);
     studentRepo.deleteAll(students);
-//    for (Student student : students) {
-//      deleteById(student.getId());
-//    }
+
   }
 
 }
