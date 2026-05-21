@@ -1,22 +1,28 @@
 package com.university.university_system.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.university.university_system.domain.Course;
 import com.university.university_system.domain.Gender;
+import com.university.university_system.domain.Professor;
 import com.university.university_system.domain.Student;
+import com.university.university_system.dto.CourseDto;
 import com.university.university_system.dto.StudentDto;
 import com.university.university_system.mapper.CourseMapper;
 import com.university.university_system.mapper.StudentMapper;
 import com.university.university_system.repository.CourseRepository;
 import com.university.university_system.repository.StudentRepository;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -318,6 +324,159 @@ class StudentServiceTest {
         .build();
 
     assertThrows(IllegalArgumentException.class,()->studentService.updateStudentFields(inputDto));
+  }
+  @Test
+  void updateStudentCourse_ShouldUpdateStudentCourse(){
+
+    Professor professor = Professor.builder()
+        .id(1L)
+        .build();
+
+    Course course = Course.builder()
+        .id(1L)
+        .name("simpantiki")
+        .description("fisiki")
+        .professor(professor)
+        .build();
+
+    StudentDto inputDto = StudentDto.builder()
+        .id(1L)
+        .firstName("leo")
+        .lastName("c")
+        .birthday(LocalDate.of(2000, 4, 4))
+        .email("l@c")
+        .phone("321")
+        .gender(Gender.FEMALE)
+        .courses(List.of(CourseDto.builder().id(1L).description("fisiki").name("simpantiki").build()))
+        .build();
+
+    Student foundStudent = Student.builder()
+        .id(1L)
+        .firstName("leo")
+        .lastName("c")
+        .birthday(LocalDate.of(2000, 4, 4))
+        .email("l@c")
+        .phone("321")
+        .gender(Gender.FEMALE)
+        .build();
+
+    StudentDto expectedStudent = StudentDto.builder()
+        .id(1L)
+        .firstName("leo")
+        .lastName("c")
+        .birthday(LocalDate.of(2000, 4, 4))
+        .email("l@c")
+        .phone("321")
+        .gender(Gender.FEMALE)
+        .courses(List.of(CourseDto.builder().id(1L).description("fisiki").name("simpantiki").build()))
+        .build();
+
+    when(studentRepo.findById(1L)).thenReturn(Optional.of(foundStudent));
+    when(courseRepo.findAllById(List.of(1L))).thenReturn(List.of(course));
+    when(studentMapper.toDto(foundStudent)).thenReturn(expectedStudent);
+
+    StudentDto result = studentService.updateStudentCourse(inputDto);
+
+    assertEquals(1L,result.getId());
+    assertEquals("leo",result.getFirstName());
+    assertNotNull(result.getCourses());
+
+    verify(studentRepo,times(1)).findById(1L);
+    verify(courseRepo,times(1)).findAllById(List.of(1L));
+
+
+  }
+
+  @Test
+  void updateStudentCourse_shouldThrowExceptionWhenStudentNotFound(){
+
+    when(studentRepo.findById(1L)).thenReturn(Optional.empty());
+
+    assertThrows(NoSuchElementException.class,()->studentService.updateStudentCourse(
+        StudentDto.builder().id(1L).build()
+    ));
+    verify(studentRepo,times(1)).findById(1L);
+  }
+
+  @Test
+  void updateStudentCourse_shouldThrowExceptionWhenCourseHasNoProfessor(){
+
+    Course course = Course.builder()
+        .id(1L)
+        .name("fisiki")
+        .professor(null)
+        .build();
+
+    Student foundStudent = Student.builder()
+        .id(1L)
+        .build();
+
+    StudentDto inputDto = StudentDto.builder()
+        .id(1L)
+        .courses(List.of(CourseDto.builder()
+            .id(1L)
+            .build()))
+        .build();
+
+    when(studentRepo.findById(1L)).thenReturn(Optional.of(foundStudent));
+    when(courseRepo.findAllById(List.of(1L))).thenReturn(List.of(course));
+
+    assertThrows(IllegalStateException.class,()->studentService.updateStudentCourse(inputDto));
+
+    verify(studentRepo).findById(1L);
+    verify(courseRepo).findAllById(List.of(1L));
+  }
+
+  @Test
+  void updateStudentCourse_shouldThrowExceptionWhenStudentDtoIsNull(){
+
+    assertThrows(IllegalArgumentException.class,()->studentService.updateStudentCourse(null));
+
+  }
+
+  @Test
+  void updateStudentCourse_shouldThrowExceptionWhenIdIsNull(){
+
+    StudentDto inputDto = StudentDto.builder()
+        .id(null)
+        .build();
+
+    assertThrows(IllegalArgumentException.class,()->studentService.updateStudentCourse(inputDto));
+
+  }
+
+  @Test
+  void updateStudentCourse_shouldNotUpdateCoursesWhenCoursesAreNull() {
+
+    Student foundStudent = Student.builder()
+        .id(1L)
+        .firstName("Fotis")
+        .build();
+
+    StudentDto expectedDto = StudentDto.builder()
+        .id(1L)
+        .firstName("Fotis")
+        .build();
+
+    StudentDto inputDto = StudentDto.builder()
+        .id(1L)
+        .courses(null)
+        .build();
+
+    when(studentRepo.findById(1L))
+        .thenReturn(Optional.of(foundStudent));
+
+    when(studentMapper.toDto(foundStudent))
+        .thenReturn(expectedDto);
+
+    StudentDto result = studentService.updateStudentCourse(inputDto);
+
+    assertEquals(1L, result.getId());
+    assertEquals("Fotis", result.getFirstName());
+
+    verify(studentRepo).findById(1L);
+    verify(courseRepo, never()).findAllById(anyList());
+
   }
 
 }
