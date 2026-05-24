@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -20,6 +21,7 @@ import com.university.university_system.repository.ProfessorRepository;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -252,6 +254,19 @@ public class ProfessorServiceTest {
     verify(professorRepo,times(1)).findById(1L);
     verify(professorRepo,times(1)).save(foundProfessor);
 
+  }
+
+  @Test
+  void updateProfessorFields_shouldThrowExceptionWhenProfessorNotFound(){
+
+    when(professorRepo.findById(1L)).thenReturn(Optional.empty());
+
+    assertThrows(NoSuchElementException.class,()->professorService.updateProfessorFields(
+        ProfessorDto.builder().id(1L).build())
+    );
+
+    verify(professorRepo,times(1)).findById(1L);
+    verify(professorRepo,never()).save(any());
   }
 
 }
