@@ -191,4 +191,67 @@ public class ProfessorServiceTest {
     verify(professorRepo,times(0)).findById(any());
 
   }
+
+  @Test
+  void updateProfessorFields_shouldUpdateProfessorDto(){
+
+    ProfessorDto inputDto = ProfessorDto.builder()
+        .id(1L)
+        .firstName("f")
+        .lastName("z")
+        .email("f@z")
+        .birthday(LocalDate.of(1993,4,4))
+        .phone("54321")
+        .gender(Gender.MALE)
+        .build();
+
+    Professor foundProfessor = Professor.builder()
+        .id(1L)
+        .firstName("f")
+        .lastName("z")
+        .email("f@z")
+        .birthday(LocalDate.of(1993,4,4))
+        .phone("54321")
+        .gender(Gender.MALE)
+        .build();
+
+    Professor updatedProfessor = Professor.builder()
+        .id(1L)
+        .firstName("q")
+        .lastName("w")
+        .email("q@w")
+        .birthday(LocalDate.of(2000,4,4))
+        .phone("12345")
+        .gender(Gender.FEMALE)
+        .build();
+
+    ProfessorDto expectedDto = ProfessorDto.builder()
+        .id(1L)
+        .firstName("q")
+        .lastName("w")
+        .email("q@w")
+        .birthday(LocalDate.of(2000,4,4))
+        .phone("12345")
+        .gender(Gender.FEMALE)
+        .build();
+
+    when(professorRepo.findById(1L)).thenReturn(Optional.of(foundProfessor));
+    when(professorRepo.save(foundProfessor)).thenReturn(updatedProfessor);
+    when(professorMapper.toDto(updatedProfessor)).thenReturn(expectedDto);
+
+    ProfessorDto result = professorService.updateProfessorFields(inputDto);
+
+    assertEquals(expectedDto.getId(), result.getId());
+    assertEquals(expectedDto.getFirstName(), result.getFirstName());
+    assertEquals(expectedDto.getLastName(), result.getLastName());
+    assertEquals(expectedDto.getBirthday(), result.getBirthday());
+    assertEquals(expectedDto.getEmail(), result.getEmail());
+    assertEquals(expectedDto.getPhone(), result.getPhone());
+    assertEquals(expectedDto.getGender(), result.getGender());
+
+    verify(professorRepo,times(1)).findById(1L);
+    verify(professorRepo,times(1)).save(foundProfessor);
+
+  }
+
 }
