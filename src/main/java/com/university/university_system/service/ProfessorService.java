@@ -49,6 +49,13 @@ public class ProfessorService {
 
   @Transactional
   public ProfessorDto updateProfessorFields(ProfessorDto professorDto) {
+    if (professorDto == null) {
+      throw new IllegalArgumentException("ProfessorDto can't be null");
+    }
+    if (professorDto.getId() == null) {
+      throw new IllegalArgumentException("Professor id can't be null");
+
+    }
     Professor updatedProfessor = professorRepo.findById(professorDto.getId())
         .map(existingProfessor -> {
 
