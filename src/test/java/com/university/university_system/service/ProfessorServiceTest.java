@@ -110,4 +110,85 @@ public class ProfessorServiceTest {
     verify(professorRepo, times(0)).save(any());
   }
 
+  @Test
+  void findById_shouldFindProfessorDto() {
+
+    Course foundCourse = Course.builder()
+        .id(1L)
+        .name("fisiki")
+        .description("simpan")
+        .build();
+
+    CourseDto expectedCourseDto = CourseDto.builder()
+        .id(1L)
+        .name("fisiki")
+        .description("simpan")
+        .build();
+
+    Professor foundProfessor = Professor.builder()
+        .id(1L)
+        .firstName("fotis")
+        .lastName("zou")
+        .birthday(LocalDate.of(1993, 4, 4))
+        .email("f@z.gr")
+        .gender(Gender.MALE)
+        .phone("210345555")
+        .courses(List.of(foundCourse))
+        .build();
+
+    ProfessorDto expectedProfessorDto = ProfessorDto.builder()
+        .id(1L)
+        .firstName("fotis")
+        .lastName("zou")
+        .birthday(LocalDate.of(1993, 4, 4))
+        .email("f@z.gr")
+        .gender(Gender.MALE)
+        .phone("210345555")
+        .courses(new ArrayList<>())
+        .build();
+
+    when(professorRepo.findById(1L)).thenReturn(Optional.of(foundProfessor));
+    when(professorMapper.toDto(foundProfessor)).thenReturn(expectedProfessorDto);
+    when(courseMapper.toDto(foundCourse)).thenReturn(expectedCourseDto);
+
+    ProfessorDto result = professorService.findById(1L).orElseThrow();
+
+    assertEquals(expectedProfessorDto.getId(), result.getId());
+    assertEquals(expectedProfessorDto.getFirstName(), result.getFirstName());
+    assertEquals(expectedProfessorDto.getLastName(), result.getLastName());
+    assertEquals(expectedProfessorDto.getEmail(), result.getEmail());
+    assertEquals(expectedProfessorDto.getPhone(), result.getPhone());
+    assertEquals(expectedProfessorDto.getGender(), result.getGender());
+
+    assertEquals(1L, result.getCourses().get(0).getId());
+    assertEquals(1, result.getCourses().size());
+    assertEquals(expectedCourseDto.getName(),
+        result.getCourses().get(0).getName());
+    assertEquals(expectedCourseDto.getDescription(),
+        result.getCourses().get(0).getDescription());
+
+    verify(professorRepo).findById(1L);
+    verify(professorMapper).toDto(foundProfessor);
+    verify(courseMapper).toDto(foundCourse);
+  }
+
+  @Test
+  void findById_professorDtoNotFound(){
+
+    when(professorRepo.findById(1L)).thenReturn(Optional.empty());
+
+    Optional<ProfessorDto> result = professorService.findById(1L);
+
+    assertTrue(result.isEmpty());
+    verify(professorRepo).findById(1L);
+  }
+
+  @Test
+  void findById_shouldThrowExceptionWhenIdIsNull(){
+
+    assertThrows(IllegalArgumentException.class,()->professorService.findById(null));
+
+    verify(professorRepo,times(0)).findById(any());
+
+  }
 }
