@@ -175,7 +175,7 @@ public class ProfessorServiceTest {
   }
 
   @Test
-  void findById_professorDtoNotFound(){
+  void findById_professorDtoNotFound() {
 
     when(professorRepo.findById(1L)).thenReturn(Optional.empty());
 
@@ -186,23 +186,23 @@ public class ProfessorServiceTest {
   }
 
   @Test
-  void findById_shouldThrowExceptionWhenIdIsNull(){
+  void findById_shouldThrowExceptionWhenIdIsNull() {
 
-    assertThrows(IllegalArgumentException.class,()->professorService.findById(null));
+    assertThrows(IllegalArgumentException.class, () -> professorService.findById(null));
 
-    verify(professorRepo,times(0)).findById(any());
+    verify(professorRepo, times(0)).findById(any());
 
   }
 
   @Test
-  void updateProfessorFields_shouldUpdateProfessorDto(){
+  void updateProfessorFields_shouldUpdateProfessorDto() {
 
     ProfessorDto inputDto = ProfessorDto.builder()
         .id(1L)
         .firstName("f")
         .lastName("z")
         .email("f@z")
-        .birthday(LocalDate.of(1993,4,4))
+        .birthday(LocalDate.of(1993, 4, 4))
         .phone("54321")
         .gender(Gender.MALE)
         .build();
@@ -212,7 +212,7 @@ public class ProfessorServiceTest {
         .firstName("f")
         .lastName("z")
         .email("f@z")
-        .birthday(LocalDate.of(1993,4,4))
+        .birthday(LocalDate.of(1993, 4, 4))
         .phone("54321")
         .gender(Gender.MALE)
         .build();
@@ -222,7 +222,7 @@ public class ProfessorServiceTest {
         .firstName("q")
         .lastName("w")
         .email("q@w")
-        .birthday(LocalDate.of(2000,4,4))
+        .birthday(LocalDate.of(2000, 4, 4))
         .phone("12345")
         .gender(Gender.FEMALE)
         .build();
@@ -232,7 +232,7 @@ public class ProfessorServiceTest {
         .firstName("q")
         .lastName("w")
         .email("q@w")
-        .birthday(LocalDate.of(2000,4,4))
+        .birthday(LocalDate.of(2000, 4, 4))
         .phone("12345")
         .gender(Gender.FEMALE)
         .build();
@@ -251,22 +251,92 @@ public class ProfessorServiceTest {
     assertEquals(expectedDto.getPhone(), result.getPhone());
     assertEquals(expectedDto.getGender(), result.getGender());
 
-    verify(professorRepo,times(1)).findById(1L);
-    verify(professorRepo,times(1)).save(foundProfessor);
+    verify(professorRepo, times(1)).findById(1L);
+    verify(professorRepo, times(1)).save(foundProfessor);
 
   }
 
   @Test
-  void updateProfessorFields_shouldThrowExceptionWhenProfessorNotFound(){
+  void updateProfessorFields_shouldThrowExceptionWhenProfessorNotFound() {
 
     when(professorRepo.findById(1L)).thenReturn(Optional.empty());
 
-    assertThrows(NoSuchElementException.class,()->professorService.updateProfessorFields(
+    assertThrows(NoSuchElementException.class, () -> professorService.updateProfessorFields(
         ProfessorDto.builder().id(1L).build())
     );
 
-    verify(professorRepo,times(1)).findById(1L);
-    verify(professorRepo,never()).save(any());
+    verify(professorRepo, times(1)).findById(1L);
+    verify(professorRepo, never()).save(any());
   }
+
+  @Test
+  void updateProfessorFields_shouldUpdateOnlyProvidedFields() {
+
+    ProfessorDto inputDto = ProfessorDto.builder()
+        .id(1L)
+        .email("new@m.gr")
+        .build();
+
+    Professor foundProfessor = Professor.builder()
+        .id(1L)
+        .firstName("Fotis")
+        .lastName("Zoumpos")
+        .birthday(LocalDate.of(1993, 4, 4))
+        .email("old@email.com")
+        .phone("123")
+        .gender(Gender.MALE)
+        .build();
+
+    Professor updatedProfessor = Professor.builder()
+        .id(1L)
+        .firstName("Fotis")
+        .lastName("Zoumpos")
+        .birthday(LocalDate.of(1993, 4, 4))
+        .email("new@m.com")
+        .phone("123")
+        .gender(Gender.MALE)
+        .build();
+
+    ProfessorDto expectedDto = ProfessorDto.builder()
+        .id(1L)
+        .firstName("Fotis")
+        .lastName("Zoumpos")
+        .birthday(LocalDate.of(1993, 4, 4))
+        .email("new@m.com")
+        .phone("123")
+        .gender(Gender.MALE)
+        .build();
+
+    when(professorRepo.findById(1L)).thenReturn(Optional.of(foundProfessor));
+    when(professorRepo.save(foundProfessor)).thenReturn(updatedProfessor);
+    when(professorMapper.toDto(updatedProfessor)).thenReturn(expectedDto);
+
+    ProfessorDto result = professorService.updateProfessorFields(inputDto);
+
+    assertEquals("Fotis", result.getFirstName());
+    assertEquals("Zoumpos", result.getLastName());
+    assertEquals("new@m.com", result.getEmail());
+    assertEquals("123", result.getPhone());
+
+    verify(professorRepo).findById(1L);
+    verify(professorRepo).save(foundProfessor);
+  }
+
+  @Test
+  void updateProfessorFields_shouldThrowExceptionWhenProfessorDtoIsNull() {
+
+    assertThrows(IllegalArgumentException.class, () -> professorService.updateProfessorFields(null));
+  }
+
+  @Test
+  void updateProfessorFields_shouldThrowExceptionWhenProfessorIdIsNull() {
+
+    ProfessorDto inputDto = ProfessorDto.builder()
+        .id(null)
+        .build();
+
+    assertThrows(IllegalArgumentException.class, () -> professorService.updateProfessorFields(inputDto));
+  }
+
 
 }
