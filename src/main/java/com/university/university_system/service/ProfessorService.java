@@ -26,41 +26,26 @@ public class ProfessorService {
   private final CourseRepository courseRepo;
 
   public ProfessorDto create(ProfessorDto professorDto) {
+    if (professorDto == null) {
+      throw new IllegalArgumentException("Professor can't be null");
+    }
     Professor professor = professorMapper.toEntity(professorDto);
     Professor savedProfessor = professorRepo.save(professor);
     return professorMapper.toDto(savedProfessor);
   }
 
-//  public Optional<ProfessorDto> findById(Long id) {
-//    return professorRepo.findById(id).map(professorMapper::toDto);
-//  }
-
   public Optional<ProfessorDto> findById(Long id) {
+    if (id == null) {
+      throw new IllegalArgumentException("Professor id can't be null");
+    }
     return professorRepo.findById(id).map(professor -> {
       ProfessorDto dto = professorMapper.toDto(professor);
-      // Μετατρέπουμε τα courses σε CourseDto
       dto.setCourses(professor.getCourses().stream()
           .map(courseMapper::toDto)
           .collect(Collectors.toList()));
       return dto;
     });
   }
-//
-//  public List<ProfessorDto> findAll() {
-//    return professorRepo.findAll()
-//        .stream()
-//        .map(professor -> {
-//          ProfessorDto dto = professorMapper.toDto(professor);
-//          dto.setCourses(
-//              professor.getCourses()
-//                  .stream()
-//                  .map(courseMapper::toDto)
-//                  .collect(Collectors.toList())
-//          );
-//          return dto;
-//        })
-//        .collect(Collectors.toList());
-//  }
 
   @Transactional
   public ProfessorDto updateProfessorFields(ProfessorDto professorDto) {
