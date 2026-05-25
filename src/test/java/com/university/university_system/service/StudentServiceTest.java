@@ -543,5 +543,24 @@ class StudentServiceTest {
     verify(studentRepo).deleteAll(students);
   }
 
+  @Test
+  void deleteAllByIds_shouldThrowExceptionWhenIdsIsNull() {
+
+    assertThrows(IllegalArgumentException.class,
+        () -> studentService.deleteAllByIds(null));
+
+    verify(studentRepo, never()).findAllById(any());
+    verify(studentRepo, never()).deleteAll(any());
+  }
+
+  @Test
+  void deleteAllByIds_shouldThrowExceptionWhenIdsIsEmpty() {
+
+    assertThrows(IllegalArgumentException.class,
+        () -> studentService.deleteAllByIds(List.of()));
+
+    verify(studentRepo, never()).findAllById(any());
+    verify(studentRepo, never()).deleteAll(any());
+  }
 
 }
