@@ -380,4 +380,18 @@ public class ProfessorServiceTest {
     verify(professorRepo).save(professor);
   }
 
+  @Test
+  void updateProfessorCourses_shouldThrowExceptionWhenProfessorNotFound() {
+
+    when(professorRepo.findById(1L)).thenReturn(Optional.empty());
+
+    assertThrows(RuntimeException.class, () -> professorService.updateProfessorCourses
+        (ProfessorDto.builder()
+            .id(1L)
+            .build()));
+
+    verify(professorRepo).findById(1L);
+    verify(professorRepo, never()).save(any());
+  }
 }
+
