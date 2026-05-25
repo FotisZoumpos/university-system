@@ -536,4 +536,37 @@ public class ProfessorServiceTest {
     verify(professorRepo, times(1)).findById(1L);
     verify(professorRepo, never()).delete(any());
   }
+
+  @Test
+  void deleteAllById_shouldSuccessfullyDeleteAllIds() {
+
+    Professor p1 = Professor.builder().id(1L).courses(new ArrayList<>()).build();
+    Professor p2 = Professor.builder().id(2L).courses(new ArrayList<>()).build();
+
+    List<Long> ids = List.of(1L, 2L);
+
+    when(professorRepo.findAllById(ids)).thenReturn(List.of(p1, p2));
+
+    when(professorRepo.findById(1L)).thenReturn(Optional.of(p1));
+    when(professorRepo.findById(2L)).thenReturn(Optional.of(p2));
+
+    professorService.deleteAllById(ids);
+
+    verify(professorRepo).findAllById(ids);
+    verify(professorRepo).findById(1L);
+    verify(professorRepo).findById(2L);
+
+    verify(professorRepo, times(2)).delete(any(Professor.class));
+  }
+
+  @Test
+  void deleteAllById_shouldHandleEmptyList() {
+
+    when(professorRepo.findAllById(List.of())).thenReturn(List.of());
+
+    professorService.deleteAllById(List.of());
+
+    verify(professorRepo).findAllById(List.of());
+    verify(professorRepo, never()).delete(any());
+  }
 }
