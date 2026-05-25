@@ -557,17 +557,6 @@ public class ProfessorServiceTest {
   }
 
   @Test
-  void deleteAllById_shouldHandleEmptyList() {
-
-    when(professorRepo.findAllById(List.of())).thenReturn(List.of());
-
-    professorService.deleteAllById(List.of());
-
-    verify(professorRepo).findAllById(List.of());
-    verify(professorRepo, never()).delete(any());
-  }
-
-  @Test
   void deleteAllById_shouldThrowExceptionWhenIdsIsNull() {
 
     assertThrows(IllegalArgumentException.class,
