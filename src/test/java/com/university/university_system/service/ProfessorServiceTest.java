@@ -460,4 +460,25 @@ public class ProfessorServiceTest {
     verify(professorRepo).save(professor);
   }
 
+  @Test
+  void updateProfessorCourses_shouldThrowExceptionWhenProfessorDtoIsNull() {
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> professorService.updateProfessorCourses(null)
+    );
+  }
+
+  @Test
+  void updateProfessorCourses_shouldThrowExceptionWhenProfessorIdIsNull() {
+
+    ProfessorDto inputDto = ProfessorDto.builder()
+        .id(null)
+        .build();
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> professorService.updateProfessorCourses(inputDto)
+    );
+  }
 }
