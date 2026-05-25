@@ -118,6 +118,10 @@ public class ProfessorService {
 
   @Transactional
   public ProfessorDto deleteById(Long id) {
+
+    if (id == null) {
+      throw new IllegalArgumentException("Professor id can't be null");
+    }
     Professor foundProfessor = professorRepo.findById(id).orElseThrow();
     if (foundProfessor.getCourses() != null) {
       for (Course course : foundProfessor.getCourses()) {
