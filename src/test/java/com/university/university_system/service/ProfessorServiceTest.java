@@ -1,6 +1,7 @@
 package com.university.university_system.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -338,5 +339,45 @@ public class ProfessorServiceTest {
     assertThrows(IllegalArgumentException.class, () -> professorService.updateProfessorFields(inputDto));
   }
 
+  @Test
+  void updateProfessorCourses_shouldUpdateProfessorCourses() {
+
+    CourseDto courseDto = CourseDto.builder()
+        .id(1L)
+        .build();
+
+    ProfessorDto inputDto = ProfessorDto.builder()
+        .id(1L)
+        .courses(List.of(courseDto))
+        .build();
+
+    Professor professor = Professor.builder()
+        .id(1L)
+        .courses(new ArrayList<>())
+        .build();
+
+    Course course = Course.builder()
+        .id(1L)
+        .build();
+
+    ProfessorDto expectedDto = ProfessorDto.builder()
+        .id(1L)
+        .build();
+
+    when(professorRepo.findById(1L)).thenReturn(Optional.of(professor));
+    when(courseRepo.findById(1L)).thenReturn(Optional.of(course));
+    when(professorRepo.save(professor)).thenReturn(professor);
+    when(professorMapper.toDto(professor)).thenReturn(expectedDto);
+
+    ProfessorDto result = professorService.updateProfessorCourses(inputDto);
+
+    assertNotNull(result);
+    assertTrue(professor.getCourses().contains(course));
+    assertEquals(professor, course.getProfessor());
+
+    verify(professorRepo).findById(1L);
+    verify(courseRepo).findById(1L);
+    verify(professorRepo).save(professor);
+  }
 
 }
