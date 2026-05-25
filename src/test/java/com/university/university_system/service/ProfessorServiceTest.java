@@ -393,5 +393,33 @@ public class ProfessorServiceTest {
     verify(professorRepo).findById(1L);
     verify(professorRepo, never()).save(any());
   }
-}
+
+  @Test
+  void updateProfessorCourses_shouldThrowExceptionWhenCourseNotFound() {
+
+    CourseDto courseDto = CourseDto.builder()
+        .id(1L)
+        .build();
+
+    ProfessorDto inputDto = ProfessorDto.builder()
+        .id(1L)
+        .courses(List.of(courseDto))
+        .build();
+
+    Professor professor = Professor.builder()
+        .id(1L)
+        .courses(new ArrayList<>())
+        .build();
+
+    when(professorRepo.findById(1L)).thenReturn(Optional.of(professor));
+    when(courseRepo.findById(1L)).thenReturn(Optional.empty());
+
+    assertThrows(RuntimeException.class,
+        () -> professorService.updateProfessorCourses(inputDto)
+    );
+
+    verify(professorRepo).findById(1L);
+    verify(courseRepo).findById(1L);
+    verify(professorRepo, never()).save(any());
+  }
 
