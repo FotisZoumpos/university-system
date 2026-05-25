@@ -139,6 +139,9 @@ public class ProfessorService {
 
   @Transactional
   public void deleteAllById(List<Long> ids) {
+    if (ids == null || ids.isEmpty()) {
+      throw new IllegalArgumentException();
+    }
     List<Professor> professors = professorRepo.findAllById(ids);
     for (Professor professor : professors) {
       deleteById(professor.getId());
