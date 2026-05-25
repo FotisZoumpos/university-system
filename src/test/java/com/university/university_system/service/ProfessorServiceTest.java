@@ -481,4 +481,35 @@ public class ProfessorServiceTest {
         () -> professorService.updateProfessorCourses(inputDto)
     );
   }
+
+  @Test
+  void deleteById_shouldDeleteProfessorById() {
+
+    Professor professor = Professor.builder()
+        .id(1L)
+        .firstName("Fotis")
+        .lastName("Zoumpos")
+        .build();
+
+    ProfessorDto expectedDto = ProfessorDto.builder()
+        .id(1L)
+        .firstName("Fotis")
+        .lastName("Zoumpos")
+        .build();
+
+    when(professorRepo.findById(1L))
+        .thenReturn(Optional.of(professor));
+
+    when(professorMapper.toDto(professor))
+        .thenReturn(expectedDto);
+
+    ProfessorDto result = professorService.deleteById(1L);
+
+    assertEquals(expectedDto.getId(), result.getId());
+    assertEquals(expectedDto.getFirstName(), result.getFirstName());
+    assertEquals(expectedDto.getLastName(), result.getLastName());
+
+    verify(professorRepo, times(1)).findById(1L);
+    verify(professorRepo, times(1)).delete(professor);
+  }
 }
