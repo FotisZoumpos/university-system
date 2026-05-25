@@ -512,4 +512,28 @@ public class ProfessorServiceTest {
     verify(professorRepo, times(1)).findById(1L);
     verify(professorRepo, times(1)).delete(professor);
   }
+
+  @Test
+  void deleteById_shouldThrowExceptionWhenIdIsNull() {
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> professorService.deleteById(null)
+    );
+  }
+
+  @Test
+  void deleteById_shouldThrowExceptionWhenProfessorNotFound() {
+
+    when(professorRepo.findById(1L))
+        .thenReturn(Optional.empty());
+
+    assertThrows(
+        NoSuchElementException.class,
+        () -> professorService.deleteById(1L)
+    );
+
+    verify(professorRepo, times(1)).findById(1L);
+    verify(professorRepo, never()).delete(any());
+  }
 }
