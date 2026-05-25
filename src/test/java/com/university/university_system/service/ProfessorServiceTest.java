@@ -423,3 +423,41 @@ public class ProfessorServiceTest {
     verify(professorRepo, never()).save(any());
   }
 
+  @Test
+  void updateProfessorCourses_shouldNotAddDuplicateCourse() {
+
+    Course course = Course.builder()
+        .id(1L)
+        .build();
+
+    Professor professor = Professor.builder()
+        .id(1L)
+        .courses(new ArrayList<>(List.of(course)))
+        .build();
+
+    CourseDto courseDto = CourseDto.builder()
+        .id(1L)
+        .build();
+
+    ProfessorDto inputDto = ProfessorDto.builder()
+        .id(1L)
+        .courses(List.of(courseDto))
+        .build();
+
+    ProfessorDto expectedDto = ProfessorDto.builder()
+        .id(1L)
+        .build();
+
+    when(professorRepo.findById(1L)).thenReturn(Optional.of(professor));
+    when(courseRepo.findById(1L)).thenReturn(Optional.of(course));
+    when(professorRepo.save(professor)).thenReturn(professor);
+    when(professorMapper.toDto(professor)).thenReturn(expectedDto);
+
+    professorService.updateProfessorCourses(inputDto);
+
+    assertEquals(1, professor.getCourses().size());
+
+    verify(professorRepo).save(professor);
+  }
+
+}
