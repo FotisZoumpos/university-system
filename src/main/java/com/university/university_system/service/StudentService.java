@@ -125,6 +125,9 @@ public class StudentService {
 
   @Transactional
   public void deleteAllByIds(List<Long> ids) {
+    if (ids == null || ids.isEmpty()) {
+      throw new IllegalArgumentException();
+    }
     List<Student> students = studentRepo.findAllById(ids);
     studentRepo.deleteAll(students);
 
