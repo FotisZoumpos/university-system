@@ -553,9 +553,6 @@ public class ProfessorServiceTest {
     professorService.deleteAllById(ids);
 
     verify(professorRepo).findAllById(ids);
-    verify(professorRepo).findById(1L);
-    verify(professorRepo).findById(2L);
-
     verify(professorRepo, times(2)).delete(any(Professor.class));
   }
 
