@@ -130,4 +130,44 @@ public class CourseServiceTest {
     verify(courseRepo,never()).findById(any());
   }
 
+  @Test
+  void updateCourseFields_shouldUpdateCourse(){
+
+    CourseDto inputDto = CourseDto.builder()
+        .id(1L)
+        .name("mathimatika")
+        .description("algevra")
+        .build();
+
+    Course foundCourse = Course.builder()
+        .id(1L)
+        .name("fisiki")
+        .description("simpantiki")
+        .build();
+
+    Course updatedCourse = Course.builder()
+        .id(1L)
+        .name("mathimatika")
+        .description("algevra")
+        .build();
+
+    CourseDto expectedDto = CourseDto.builder()
+        .id(1L)
+        .name("mathimatika")
+        .description("algevra")
+        .build();
+
+    when(courseRepo.findById(1L)).thenReturn(Optional.of(foundCourse));
+    when(courseRepo.save(foundCourse)).thenReturn(updatedCourse);
+    when(courseMapper.toDto(updatedCourse)).thenReturn(expectedDto);
+
+    CourseDto result = courseService.updateCourseFields(inputDto);
+
+    assertEquals(expectedDto.getId(),result.getId());
+    assertEquals(expectedDto.getName(),result.getName());
+    assertEquals(expectedDto.getDescription(),result.getDescription());
+
+    verify(courseRepo,times(1)).findById(1L);
+    verify(courseRepo,times(1)).save(foundCourse);
+  }
 }
