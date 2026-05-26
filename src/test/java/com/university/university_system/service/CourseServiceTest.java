@@ -376,4 +376,24 @@ public class CourseServiceTest {
     verify(courseRepo).findById(1L);
     verify(courseRepo,never()).delete(any());
   }
+
+  @Test
+  void deleteAllById_shouldSuccessfullyDeleteAllIds(){
+
+    List<Long> ids = List.of(1L,2L);
+
+    List<Course> courses = List.of(
+        Course.builder().id(1L).build(),
+        Course.builder().id(2L).build()
+    );
+
+    when(courseRepo.findAllById(ids)).thenReturn(courses);
+
+    courseService.deleteAllById(ids);
+
+    verify(courseRepo).findAllById(ids);
+    verify(courseRepo).deleteAll(courses);
+  }
+
 }
+
