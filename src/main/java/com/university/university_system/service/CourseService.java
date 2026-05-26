@@ -5,7 +5,6 @@ import com.university.university_system.domain.Professor;
 import com.university.university_system.domain.Student;
 import com.university.university_system.dto.CourseDto;
 import com.university.university_system.mapper.CourseMapper;
-import com.university.university_system.mapper.ProfessorMapper;
 import com.university.university_system.repository.CourseRepository;
 import com.university.university_system.repository.ProfessorRepository;
 import jakarta.transaction.Transactional;
@@ -21,13 +20,11 @@ public class CourseService {
   private final CourseRepository courseRepo;
   private final CourseMapper courseMapper;
   private final ProfessorRepository professorRepo;
-  private final ProfessorMapper professorMapper;
-
-//  public Course create(Course course) {
-//    return courseRepo.save(course);
-//  }
 
   public CourseDto create(CourseDto courseDto) {
+    if (courseDto == null) {
+      throw new IllegalArgumentException("StudentDto can't be null");
+    }
     Course course = courseMapper.toEntity(courseDto);
     Course savedCourse = courseRepo.save(course);
     return courseMapper.toDto(savedCourse);
