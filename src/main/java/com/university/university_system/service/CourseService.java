@@ -111,6 +111,8 @@ public class CourseService {
       throw new IllegalArgumentException();
     }
     List<Course> courses = courseRepo.findAllById(ids);
-    courseRepo.deleteAll(courses);
+    for (Course course : courses) {
+      deleteById(course.getId());
+    }
   }
 }
