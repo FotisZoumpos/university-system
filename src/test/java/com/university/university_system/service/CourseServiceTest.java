@@ -360,4 +360,20 @@ public class CourseServiceTest {
     verify(courseMapper).toDto(foundCourse);
   }
 
+  @Test
+  void deleteById_shouldThrowExceptionWhenIdIsNull(){
+
+    assertThrows(IllegalArgumentException.class,()->courseService.deleteById(null));
+  }
+
+  @Test
+  void deleteById_shouldThrowExceptionWhenCourseNotFound(){
+
+    when(courseRepo.findById(1L)).thenReturn(Optional.empty());
+
+    assertThrows(RuntimeException.class, () -> courseService.deleteById(1L));
+
+    verify(courseRepo).findById(1L);
+    verify(courseRepo,never()).delete(any());
+  }
 }
