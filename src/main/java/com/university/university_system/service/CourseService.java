@@ -82,6 +82,9 @@ public class CourseService {
 
   @Transactional
   public CourseDto deleteById(Long id) {
+    if (id == null) {
+      throw new IllegalArgumentException("Course id cannot be null");
+    }
     Optional<Course> courseOpt = courseRepo.findById(id);
     if (courseOpt.isPresent()) {
       Course course = courseOpt.get();
