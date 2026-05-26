@@ -289,4 +289,31 @@ public class CourseServiceTest {
     verify(professorRepo).findById(1L);
     verify(courseRepo).save(course);
   }
+
+  @Test
+  void updateCourseProfessor_shouldThrowExceptionWhenCourseNotFound(){
+
+    when(courseRepo.findById(1L)).thenReturn(Optional.empty());
+
+    assertThrows(NoSuchElementException.class,()->courseService.updateCourseProfessor(
+        CourseDto.builder().id(1L).build()
+    ));
+
+    verify(courseRepo,times(1)).findById(1L);
+  }
+
+  @Test
+  void updateCourseProfessor_shouldThrowExceptionWhenCourseDtoIsNull(){
+
+    assertThrows(IllegalArgumentException.class,()->courseService.updateCourseProfessor(null));
+  }
+
+  @Test
+  void updateCourseProfessor_shouldThrowExceptionWhenCourseIdIsNull(){
+
+    CourseDto inputDto = CourseDto.builder()
+            .id(null).build();
+
+    assertThrows(IllegalArgumentException.class,()->courseService.updateCourseProfessor(inputDto));
+  }
 }
