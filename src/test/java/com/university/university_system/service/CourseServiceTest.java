@@ -1,6 +1,7 @@
 package com.university.university_system.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -11,11 +12,13 @@ import static org.mockito.Mockito.when;
 
 import com.university.university_system.domain.Course;
 import com.university.university_system.domain.Professor;
+import com.university.university_system.domain.Student;
 import com.university.university_system.dto.CourseDto;
 import com.university.university_system.dto.ProfessorDto;
 import com.university.university_system.mapper.CourseMapper;
 import com.university.university_system.repository.CourseRepository;
 import com.university.university_system.repository.ProfessorRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -316,4 +319,45 @@ public class CourseServiceTest {
 
     assertThrows(IllegalArgumentException.class,()->courseService.updateCourseProfessor(inputDto));
   }
+
+  @Test
+  void deleteById_shouldDeleteCourseById(){
+
+    Professor professor = Professor.builder()
+        .id(1L)
+        .courses(new ArrayList<>())
+        .build();
+
+    Student student = Student.builder()
+        .id(1L)
+        .courses(new ArrayList<>())
+        .build();
+
+    Course foundCourse = Course.builder()
+        .id(1L)
+        .professor(professor)
+        .build();
+
+    CourseDto expectedDto = CourseDto.builder()
+        .id(1L)
+        .build();
+
+    when(courseRepo.findById(1L)).thenReturn(Optional.of(foundCourse));
+    when(courseMapper.toDto(foundCourse)).thenReturn(expectedDto);
+
+    CourseDto result = courseService.deleteById(1L);
+
+    assertEquals(1L,result.getId());
+
+    assertNull(foundCourse.getProfessor());
+    assertTrue(professor.getCourses().isEmpty());
+
+    assertTrue(foundCourse.getStudents().isEmpty());
+    assertTrue(student.getCourses().isEmpty());
+
+    verify(courseRepo).findById(1L);
+    verify(courseRepo).delete(foundCourse);
+    verify(courseMapper).toDto(foundCourse);
+  }
+
 }
