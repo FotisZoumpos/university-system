@@ -111,5 +111,17 @@ public class CourseServiceTest {
     verify(courseRepo,times(1)).findById(1L);
   }
 
+  @Test
+  void findById_courseDtoNotFound(){
+
+    when(courseRepo.findById(1L)).thenReturn(Optional.empty());
+
+    Optional<CourseDto> result = courseService.findById(1L);
+    assertTrue(result.isEmpty());
+
+    verify(courseRepo,times(1)).findById(1L);
+  }
+
+
 
 }
