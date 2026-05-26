@@ -61,6 +61,12 @@ public class CourseService {
 
   @Transactional
   public CourseDto updateCourseProfessor(CourseDto courseDto) {
+    if (courseDto == null) {
+      throw new IllegalArgumentException("StudedntDto can't be null");
+    }
+    if (courseDto.getId() == null) {
+      throw new IllegalArgumentException("Id can't be null");
+    }
     Course updatedCourse = courseRepo.findById(courseDto.getId())
         .map(existingCourse -> {
           if (courseDto.getProfessor() != null) {
