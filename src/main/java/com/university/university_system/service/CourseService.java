@@ -107,9 +107,10 @@ public class CourseService {
 
   @Transactional
   public void deleteAllById(List<Long> ids) {
-    List<Course> courses = courseRepo.findAllById(ids);
-    for (Course course : courses) {
-      deleteById(course.getId());
+    if (ids == null || ids.isEmpty()) {
+      throw new IllegalArgumentException();
     }
+    List<Course> courses = courseRepo.findAllById(ids);
+    courseRepo.deleteAll(courses);
   }
 }
