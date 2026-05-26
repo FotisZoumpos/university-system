@@ -33,13 +33,11 @@ public class CourseController {
         .orElseThrow(() -> new RuntimeException("Course not found"));
   }
 
-  //@PatchMapping
   @PutMapping("/update")
   public CourseDto updateCourse(@RequestBody CourseDto courseDto) {
     return courseService.updateCourseFields(courseDto);
   }
 
-  //@PatchMapping
   @PutMapping("/update-professor")
   public CourseDto updateCourseProfessor(@RequestBody CourseDto courseDto) {
     return courseService.updateCourseProfessor(courseDto);

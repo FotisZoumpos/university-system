@@ -33,12 +33,12 @@ public class StudentController {
         .orElseThrow(() -> new RuntimeException("Student not found"));
   }
 
-  //@PatchMapping
+
   @PutMapping("/update")
   public StudentDto updateStudent(@RequestBody StudentDto studentDto) {
     return studentService.updateStudentFields(studentDto);
   }
-  //@PatchMapping
+
   @PutMapping("/update-courses")
   public StudentDto updateStudentCourses(@RequestBody StudentDto studentDto) {
     return studentService.updateStudentCourse(studentDto);

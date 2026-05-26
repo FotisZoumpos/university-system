@@ -6,7 +6,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -33,18 +32,11 @@ public class ProfessorController {
         .orElseThrow(() -> new RuntimeException("Professor not found"));
   }
 
-//  @GetMapping
-//  public List<ProfessorDto> getAllProfessors() {
-//    return professorService.findAll();
-//  }
-
-  //@PatchMapping
   @PutMapping("/update")
   public ProfessorDto updateProfessor(@RequestBody ProfessorDto professorDto) {
     return professorService.updateProfessorFields(professorDto);
   }
 
-  //@PatchMapping
   @PutMapping("/update-courses")
   public ProfessorDto updateProfessorCourses(@RequestBody ProfessorDto professorDto) {
     return professorService.updateProfessorCourses(professorDto);
