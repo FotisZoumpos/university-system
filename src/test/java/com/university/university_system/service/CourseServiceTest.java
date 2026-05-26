@@ -183,4 +183,45 @@ public class CourseServiceTest {
     verify(courseRepo,times(1)).findById(1L);
     verify(courseRepo,never()).save(any());
   }
+
+  @Test
+  void updateCourseFields_shouldUpdateOnlyProvidedFields(){
+    CourseDto inputDto = CourseDto.builder()
+        .id(1L)
+        .name("gimnastiki")
+        .build();
+
+    Course foundCourse = Course.builder()
+        .id(1L)
+        .name("fisiki")
+        .description("simpantiki")
+        .build();
+
+    Course updatedCourse = Course.builder()
+        .id(1L)
+        .name("gimnastiki")
+        .description("simpantiki")
+        .build();
+
+    CourseDto expectedDto = CourseDto.builder()
+        .id(1L)
+        .name("gimnastiki")
+        .description("simpantiki")
+        .build();
+
+    when(courseRepo.findById(1L)).thenReturn(Optional.of(foundCourse));
+    when(courseRepo.save(foundCourse)).thenReturn(updatedCourse);
+    when((courseMapper.toDto(updatedCourse))).thenReturn(expectedDto);
+
+    CourseDto result = courseService.updateCourseFields(inputDto);
+
+    assertEquals("gimnastiki", result.getName());
+    assertEquals("simpantiki", result.getDescription());
+
+    assertEquals("gimnastiki", foundCourse.getName());
+    assertEquals("simpantiki", foundCourse.getDescription());
+
+    verify(courseRepo,times(1)).findById(1L);
+    verify(courseRepo,times(1)).save(foundCourse);
+  }
 }
