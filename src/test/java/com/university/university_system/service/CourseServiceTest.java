@@ -224,4 +224,21 @@ public class CourseServiceTest {
     verify(courseRepo,times(1)).findById(1L);
     verify(courseRepo,times(1)).save(foundCourse);
   }
+
+@Test
+void updateCourseFields_shouldThrowExceptionWhenCourseDtoIsNull(){
+
+    assertThrows(IllegalArgumentException.class,()->courseService.updateCourseFields(null));
+}
+
+@Test
+  void updateCourseFields_shouldThrowExceptionWhenCourseIdIsNull(){
+
+    CourseDto inputDto = CourseDto.builder()
+        .id(null)
+        .build();
+
+    assertThrows(IllegalArgumentException.class,()->courseService.updateCourseFields(inputDto));
+
+}
 }
