@@ -1,6 +1,8 @@
 package com.university.university_system.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -20,7 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class CourseServiceTest {
 
   @Mock
-  private  CourseRepository courseRepo;
+  private CourseRepository courseRepo;
 
   @Mock
   private CourseMapper courseMapper;
@@ -32,7 +34,7 @@ public class CourseServiceTest {
   private CourseService courseService;
 
   @Test
-  void create_shouldReturnStudentDto(){
+  void create_shouldReturnStudentDto() {
 
     CourseDto inputDto = CourseDto.builder()
         .description("algevra")
@@ -62,11 +64,19 @@ public class CourseServiceTest {
 
     CourseDto result = courseService.create(inputDto);
 
-    assertEquals(1L,result.getId());
-    assertEquals("algevra",result.getDescription());
-    assertEquals("mathimatika",result.getName());
+    assertEquals(1L, result.getId());
+    assertEquals("algevra", result.getDescription());
+    assertEquals("mathimatika", result.getName());
 
-    verify(courseRepo,times(1)).save(course);
+    verify(courseRepo, times(1)).save(course);
+  }
+
+  @Test
+  void create_shouldThrowExceptionWhenCourseDtoIsNull() {
+
+    assertThrows(IllegalArgumentException.class, () -> courseService.create(null));
+    verify(courseRepo,times(0)).save(any());
+
   }
 
 }
