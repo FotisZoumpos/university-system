@@ -122,6 +122,12 @@ public class CourseServiceTest {
     verify(courseRepo,times(1)).findById(1L);
   }
 
+  @Test
+  void findById_shouldThrowExceptionWhenIdIsNull(){
 
+    assertThrows(IllegalArgumentException.class,()->courseService.findById(null));
+
+    verify(courseRepo,never()).findById(any());
+  }
 
 }
