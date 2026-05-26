@@ -2,7 +2,9 @@ package com.university.university_system.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -12,6 +14,8 @@ import com.university.university_system.dto.CourseDto;
 import com.university.university_system.mapper.CourseMapper;
 import com.university.university_system.repository.CourseRepository;
 import com.university.university_system.repository.ProfessorRepository;
+import java.util.Optional;
+import lombok.ToString;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -78,5 +82,34 @@ public class CourseServiceTest {
     verify(courseRepo,times(0)).save(any());
 
   }
+
+  @Test
+  void findById_shouldFindCourseDto(){
+
+    Course foundCourse = Course.builder()
+        .id(1L)
+        .name("fisiki")
+        .description("simpantiki")
+        .build();
+
+
+    CourseDto expectedDto = CourseDto.builder()
+        .id(1L)
+        .name("fisiki")
+        .description("simpantiki")
+        .build();
+
+    when(courseRepo.findById(1L)).thenReturn(Optional.of(foundCourse));
+    when(courseMapper.toDto(foundCourse)).thenReturn(expectedDto);
+
+    Optional<CourseDto> result = courseService.findById(1L);
+
+    assertEquals(1L,result.get().getId());
+    assertEquals("fisiki",result.get().getName());
+    assertEquals("simpantiki",result.get().getDescription());
+
+    verify(courseRepo,times(1)).findById(1L);
+  }
+
 
 }
