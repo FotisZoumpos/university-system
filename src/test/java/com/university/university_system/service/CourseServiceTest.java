@@ -395,5 +395,24 @@ public class CourseServiceTest {
     verify(courseRepo).deleteAll(courses);
   }
 
+  @Test
+  void deleteAllById_shouldThrowExceptionWhenIdsIsNull(){
+
+    assertThrows(IllegalArgumentException.class,()->courseService.deleteAllById(null));
+
+    verify(courseRepo, never()).findAllById(any());
+    verify(courseRepo, never()).deleteAll(any());
+
+  }
+
+  @Test
+  void deleteAllById_shouldThrowExceptionWhenIdsIsEmpty(){
+
+    assertThrows(IllegalArgumentException.class,()->courseService.deleteAllById(List.of()));
+
+    verify(courseRepo, never()).findAllById(any());
+    verify(courseRepo, never()).deleteAll(any());
+  }
+
 }
 
