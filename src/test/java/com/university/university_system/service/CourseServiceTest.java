@@ -10,10 +10,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.university.university_system.domain.Course;
+import com.university.university_system.domain.Professor;
 import com.university.university_system.dto.CourseDto;
+import com.university.university_system.dto.ProfessorDto;
 import com.university.university_system.mapper.CourseMapper;
 import com.university.university_system.repository.CourseRepository;
 import com.university.university_system.repository.ProfessorRepository;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -180,12 +183,12 @@ public class CourseServiceTest {
             CourseDto.builder().id(1L).build()
         )
     );
-    verify(courseRepo,times(1)).findById(1L);
-    verify(courseRepo,never()).save(any());
+    verify(courseRepo, times(1)).findById(1L);
+    verify(courseRepo, never()).save(any());
   }
 
   @Test
-  void updateCourseFields_shouldUpdateOnlyProvidedFields(){
+  void updateCourseFields_shouldUpdateOnlyProvidedFields() {
     CourseDto inputDto = CourseDto.builder()
         .id(1L)
         .name("gimnastiki")
@@ -221,24 +224,69 @@ public class CourseServiceTest {
     assertEquals("gimnastiki", foundCourse.getName());
     assertEquals("simpantiki", foundCourse.getDescription());
 
-    verify(courseRepo,times(1)).findById(1L);
-    verify(courseRepo,times(1)).save(foundCourse);
+    verify(courseRepo, times(1)).findById(1L);
+    verify(courseRepo, times(1)).save(foundCourse);
   }
 
-@Test
-void updateCourseFields_shouldThrowExceptionWhenCourseDtoIsNull(){
+  @Test
+  void updateCourseFields_shouldThrowExceptionWhenCourseDtoIsNull() {
 
-    assertThrows(IllegalArgumentException.class,()->courseService.updateCourseFields(null));
-}
+    assertThrows(IllegalArgumentException.class, () -> courseService.updateCourseFields(null));
+  }
 
-@Test
-  void updateCourseFields_shouldThrowExceptionWhenCourseIdIsNull(){
+  @Test
+  void updateCourseFields_shouldThrowExceptionWhenCourseIdIsNull() {
 
     CourseDto inputDto = CourseDto.builder()
         .id(null)
         .build();
 
-    assertThrows(IllegalArgumentException.class,()->courseService.updateCourseFields(inputDto));
+    assertThrows(IllegalArgumentException.class, () -> courseService.updateCourseFields(inputDto));
 
-}
+  }
+
+  @Test
+  void updateCourseProfessor_shouldUpdateCourseProfessor(){
+
+    Professor professor = Professor.builder()
+        .id(1L)
+        .build();
+
+    ProfessorDto professorDto = ProfessorDto.builder()
+        .id(1L)
+        .build();
+
+    Course course = Course.builder()
+        .id(1L)
+        .build();
+
+    Course updatedCourse = Course.builder()
+        .id(1L)
+        .professor(professor)
+        .build();
+
+    CourseDto inputDto = CourseDto.builder()
+        .id(1L)
+        .professor(professorDto)
+        .build();
+
+    CourseDto expectedDto = CourseDto.builder()
+        .id(1L)
+        .professor(professorDto)
+        .build();
+
+    when(courseRepo.findById(1L)).thenReturn(Optional.of(course));
+    when(professorRepo.findById(1L)).thenReturn(Optional.of(professor));
+    when(courseRepo.save(course)).thenReturn(updatedCourse);
+    when(courseMapper.toDto(updatedCourse)).thenReturn(expectedDto);
+
+    CourseDto result = courseService.updateCourseProfessor(inputDto);
+
+    assertEquals(1L, result.getId());
+    assertEquals(1L, result.getProfessor().getId());
+
+    verify(courseRepo).findById(1L);
+    verify(professorRepo).findById(1L);
+    verify(courseRepo).save(course);
+  }
 }
