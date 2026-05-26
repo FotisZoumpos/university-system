@@ -14,8 +14,8 @@ import com.university.university_system.dto.CourseDto;
 import com.university.university_system.mapper.CourseMapper;
 import com.university.university_system.repository.CourseRepository;
 import com.university.university_system.repository.ProfessorRepository;
+import java.util.NoSuchElementException;
 import java.util.Optional;
-import lombok.ToString;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -79,12 +79,12 @@ public class CourseServiceTest {
   void create_shouldThrowExceptionWhenCourseDtoIsNull() {
 
     assertThrows(IllegalArgumentException.class, () -> courseService.create(null));
-    verify(courseRepo,times(0)).save(any());
+    verify(courseRepo, times(0)).save(any());
 
   }
 
   @Test
-  void findById_shouldFindCourseDto(){
+  void findById_shouldFindCourseDto() {
 
     Course foundCourse = Course.builder()
         .id(1L)
@@ -104,34 +104,34 @@ public class CourseServiceTest {
 
     Optional<CourseDto> result = courseService.findById(1L);
 
-    assertEquals(1L,result.get().getId());
-    assertEquals("fisiki",result.get().getName());
-    assertEquals("simpantiki",result.get().getDescription());
+    assertEquals(1L, result.get().getId());
+    assertEquals("fisiki", result.get().getName());
+    assertEquals("simpantiki", result.get().getDescription());
 
-    verify(courseRepo,times(1)).findById(1L);
+    verify(courseRepo, times(1)).findById(1L);
   }
 
   @Test
-  void findById_courseDtoNotFound(){
+  void findById_courseDtoNotFound() {
 
     when(courseRepo.findById(1L)).thenReturn(Optional.empty());
 
     Optional<CourseDto> result = courseService.findById(1L);
     assertTrue(result.isEmpty());
 
-    verify(courseRepo,times(1)).findById(1L);
+    verify(courseRepo, times(1)).findById(1L);
   }
 
   @Test
-  void findById_shouldThrowExceptionWhenIdIsNull(){
+  void findById_shouldThrowExceptionWhenIdIsNull() {
 
-    assertThrows(IllegalArgumentException.class,()->courseService.findById(null));
+    assertThrows(IllegalArgumentException.class, () -> courseService.findById(null));
 
-    verify(courseRepo,never()).findById(any());
+    verify(courseRepo, never()).findById(any());
   }
 
   @Test
-  void updateCourseFields_shouldUpdateCourse(){
+  void updateCourseFields_shouldUpdateCourse() {
 
     CourseDto inputDto = CourseDto.builder()
         .id(1L)
@@ -163,11 +163,24 @@ public class CourseServiceTest {
 
     CourseDto result = courseService.updateCourseFields(inputDto);
 
-    assertEquals(expectedDto.getId(),result.getId());
-    assertEquals(expectedDto.getName(),result.getName());
-    assertEquals(expectedDto.getDescription(),result.getDescription());
+    assertEquals(expectedDto.getId(), result.getId());
+    assertEquals(expectedDto.getName(), result.getName());
+    assertEquals(expectedDto.getDescription(), result.getDescription());
 
+    verify(courseRepo, times(1)).findById(1L);
+    verify(courseRepo, times(1)).save(foundCourse);
+  }
+
+  @Test
+  void updateCourseFields_shouldThrowExceptionWhenCourseNotFound() {
+
+    when(courseRepo.findById(1L)).thenReturn(Optional.empty());
+
+    assertThrows(NoSuchElementException.class, () -> courseService.updateCourseFields(
+            CourseDto.builder().id(1L).build()
+        )
+    );
     verify(courseRepo,times(1)).findById(1L);
-    verify(courseRepo,times(1)).save(foundCourse);
+    verify(courseRepo,never()).save(any());
   }
 }
