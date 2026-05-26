@@ -382,17 +382,17 @@ public class CourseServiceTest {
 
     List<Long> ids = List.of(1L,2L);
 
-    List<Course> courses = List.of(
-        Course.builder().id(1L).build(),
-        Course.builder().id(2L).build()
-    );
+    Course course1 = Course.builder().id(1L).build();
+    Course course2 = Course.builder().id(2L).build();
 
-    when(courseRepo.findAllById(ids)).thenReturn(courses);
+    when(courseRepo.findAllById(ids)).thenReturn(List.of(course1,course2));
+    when(courseRepo.findById(1L)).thenReturn(Optional.of(course1));
+    when(courseRepo.findById(2L)).thenReturn(Optional.of(course2));
 
     courseService.deleteAllById(ids);
 
     verify(courseRepo).findAllById(ids);
-    verify(courseRepo).deleteAll(courses);
+    verify(courseRepo,times(2)).delete(any(Course.class));
   }
 
   @Test
