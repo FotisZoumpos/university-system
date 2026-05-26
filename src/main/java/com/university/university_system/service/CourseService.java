@@ -31,6 +31,9 @@ public class CourseService {
   }
 
   public Optional<CourseDto> findById(Long id) {
+    if (id == null) {
+      throw new IllegalArgumentException("Course id can't be null");
+    }
     return courseRepo.findById(id).map(courseMapper::toDto);
   }
 
